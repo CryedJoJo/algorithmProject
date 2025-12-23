@@ -491,6 +491,39 @@ public:
 
 # ！并查集
 
+flowchart TD
+    A[开始：读题] --> B{题目是否涉及<br/>连通性 / 同一集合？}
+
+```mermaid
+B -- 否 --> Z[并查集<br/>可能不是最优解]
+
+B -- 是 --> C{最终结果<br/>是一个“数量”吗？}
+
+C -- 是 --> D[类型一：连通块数量型<br/>如 200 / 547]
+D --> D1[初始化 count = n]
+D1 --> D2[union 成功一次 → count--]
+D2 --> D3[返回 count]
+
+C -- 否 --> E{是否按顺序加边<br/>并判断是否成环？}
+
+E -- 是 --> F[类型二：成环判断型<br/>如 684]
+F --> F1[遍历每条边]
+F1 --> F2{find(u) == find(v)?}
+F2 -- 是 --> F3[当前边是冗余边]
+F2 -- 否 --> F4[union(u, v)]
+
+E -- 否 --> G{是否涉及删除 / 感染 / 影响范围 / 收益？}
+
+G -- 是 --> H[类型三：连通块属性分析型<br/>如 924 / 928 / 803]
+H --> H1[只建一次并查集]
+H1 --> H2[统计每个连通块 size]
+H2 --> H3[统计特殊节点数量<br/>(感染源等)]
+H3 --> H4[分析每个候选点的贡献]
+H4 --> H5[选择最优答案]
+
+G -- 否 --> Y[需进一步分析题目<br/>并查集可能不是最佳方案]
+```
+
 <span style=color:red>200. 岛屿数量</span>(https://leetcode.cn/problems/number-of-islands/)
 
 中等
@@ -803,7 +836,151 @@ public:
 输出：0
 ```
 
- 
+
+
+下面是第一次写出来的莫名其妙的代码
+
+非常好，这一步你是在**做“代码级复盘”**，这是进阶到高手的关键 👍
+下面我**不重写代码、不换思路**，只在你这份代码的**具体错误行上加「逐行注释」**，明确说明：
+
+> **这一行“原本错在哪里 / 为什么一定错”**
+
+------
+
+```cpp
+class findUnion{
+public:
+    findUnion(int size):parent(size), count(0){
+        for(int i = 0; i < size; ++i){
+            parent[i] = i;
+        }
+    }
+
+    int find(int a){
+        if(parent[a] != a)
+            parent[a] = find(parent[a]);
+        return parent[a];
+    }
+
+    void unionTow(int a, int b){
+        int parentA = find(a);
+        int parentB = find(b);
+
+        if(parentA == parentB) return;
+        count++; 
+        // ❌ 错误 1：
+        // count 在这里统计的是「并查集合并次数」
+        // 但在 924 题中，我们需要的是「感染节点数量 / 连通块大小」
+        // 合并次数 ≠ 节点数 ≠ 拯救规模
+        parent[parentB] = parentA;
+    }
+
+    int count;          // ❌ 错误 2：
+                          // 这个 count 语义错误
+                          // 你后面把它当作「感染规模 / 拯救数量」
+                          // 实际它只是 union 次数
+    vector<int> parent;
+};
+
+class Solution {
+public:
+    int minMalwareSpread(vector<vector<int>>& graph, vector<int>& initial) {
+        int nodeCount = graph.size();
+        int answer = initial[0];
+        int count = 0;   // ❌ 错误 3：
+                          // 这个 count 用来记录“当前最优拯救数量”
+                          // 但你后面拿它和 fu.count（合并次数）比较
+                          // 两者完全不是一个概念
+
+        for(auto node: initial){
+            findUnion fu(nodeCount);
+
+            for(int row = 0; row < nodeCount; ++row){
+                if(node == row) continue; 
+                // ⚠️ 这里的 continue 本意是“模拟删除 node”
+                // 但并查集本身已经不适合用这种方式做「删点重建」
+
+                for(int clos = 0; clos < nodeCount; ++clos){
+                    if(row == clos || node == clos) continue;
+                    // ⚠️ 同上，逻辑表面合理，但整体建模方向已经错
+
+                    if(graph[row][clos] == 1){
+                        fu.unionTow(node, clos);
+                        // ❌ 错误 4（最致命）：
+                        // 你此时在遍历 row 和 clos
+                        // 但合并的却是 node 和 clos
+                        //
+                        // 这等价于：
+                        //   把所有连通关系都强行连到 node 上
+                        //
+                        // 正确的合并对象应该是：
+                        //   fu.unionTow(row, clos)
+                        //
+                        // 并且 node（被移除的点）根本不该参与并查集
+                    }
+                }
+            }
+
+            int curCount = fu.count;
+            // ❌ 错误 5：
+            // curCount 是“union 次数”
+            // 不是感染节点数
+            // 不是最终会被感染的节点数量
+
+            if(curCount >= count){
+                count == curCount;
+                // ❌ 错误 6（低级但致命）：
+                // 这里用了 “==” 比较
+                // 实际你想写的是赋值：
+                // count = curCount;
+
+                if(node < answer){
+                    answer = node;
+                }
+            }
+        }
+        return answer;
+    }
+};
+```
+
+------
+
+🔥 总结：这段代码「为什么必错」
+
+不是 bug 多，而是 **建模方向根本不成立**
+
+你在做的是：
+
+> **“枚举删除一个感染点，然后用并查集算感染规模”**
+
+但 **924 题不能这么建模**，原因是：
+
+1. 并查集不擅长“删点”
+2. 感染传播取决于：
+   - 连通块大小
+   - **一个连通块中感染源的数量**
+3. union 次数 ≠ 连通块规模
+
+------
+
+🧠 给你一个“错误代码反思口诀”（很值钱）
+
+> **并查集里：**
+>
+> - `union 次数` 永远不能当结果
+> - **先建图，再分析连通块属性**
+> - 924 是“分析题”，不是“模拟题”
+
+------
+
+如果你愿意，下一步我可以帮你：
+
+1️⃣ **在你这份代码基础上最小改动改对（对比版）**
+2️⃣ **画图解释：为什么“删点 + 并查集”天生不适合 924**
+3️⃣ **总结 924 / 928 / 803 这类“高级并查集题型套路”**
+
+你选一个，我按你选的来。
 
 685
 
