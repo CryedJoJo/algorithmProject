@@ -2,7 +2,9 @@ discription：This project is created to document my journey of practicing LeetC
 
 # ！递归
 
-<span style=color:red>70.爬楼梯</span>(https://leetcode.cn/problems/climbing-stairs/) 
+### <span style=color:red>70.爬楼梯</span>
+
+(https://leetcode.cn/problems/climbing-stairs/) 
 
 <span style=color:red></span>
 
@@ -79,7 +81,9 @@ public:
 };
 ```
 
-<span style=color:red>509. 斐波那契数</span>(https://leetcode.cn/problems/fibonacci-number/)
+### <span style=color:red>509. 斐波那契数</span>
+
+(https://leetcode.cn/problems/fibonacci-number/)
 
 简单
 
@@ -135,17 +139,19 @@ public:
 };
 ```
 
-394 
+### 394 
 
-60 
+### 60 
 
-273
+### 273
 
 # 分治
 
-169 
+### 169 
 
-<span style=color:red>240. 搜索二维矩阵 II</span>(https://leetcode.cn/problems/search-a-2d-matrix-ii/)
+### <span style=color:red>240. 搜索二维矩阵 II</span>
+
+(https://leetcode.cn/problems/search-a-2d-matrix-ii/)
 
 中等
 
@@ -230,13 +236,15 @@ public:
 
 
 
-23
+### 23
 
 
 
 # ！单调栈
 
-<span style=color:red>739. 每日温度</span>(https://leetcode.cn/problems/daily-temperatures/)
+### <span style=color:red>739. 每日温度</span>
+
+(https://leetcode.cn/problems/daily-temperatures/)
 
 中等
 
@@ -299,7 +307,9 @@ public:
 
 
 
-<span style=color:red>503. 下一个更大元素 II</span>(https://leetcode.cn/problems/next-greater-element-ii/)
+### <span style=color:red>503. 下一个更大元素 II</span>
+
+(https://leetcode.cn/problems/next-greater-element-ii/)
 
 中等
 
@@ -350,7 +360,9 @@ public:
 
 
 
-<span style=color:red>84. 柱状图中最大的矩形</span>(https://leetcode.cn/problems/largest-rectangle-in-histogram/)
+### <span style=color:red>84. 柱状图中最大的矩形</span>
+
+(https://leetcode.cn/problems/largest-rectangle-in-histogram/)
 
 困难
 
@@ -425,7 +437,9 @@ public:
 
 
 
-<span style=color:red>85. 最大矩形</span>(https://leetcode.cn/problems/maximal-rectangle/)
+### <span style=color:red>85. 最大矩形</span>
+
+(https://leetcode.cn/problems/maximal-rectangle/)
 
 已解答
 
@@ -487,7 +501,7 @@ public:
 
 
 
-1776
+### 1776
 
 # ！并查集
 
@@ -524,7 +538,9 @@ H4 --> H5[选择最优答案]
 G -- 否 --> Y[需进一步分析题目<br/>并查集可能不是最佳方案]
 ```
 
-<span style=color:red>200. 岛屿数量</span>(https://leetcode.cn/problems/number-of-islands/)
+### <span style=color:red>200. 岛屿数量</span>
+
+(https://leetcode.cn/problems/number-of-islands/)
 
 中等
 
@@ -648,7 +664,9 @@ public:
 
 
 
-<span style=color:red>684. 冗余连接</span>(https://leetcode.cn/problems/redundant-connection/)
+### <span style=color:red>684. 冗余连接</span>
+
+(https://leetcode.cn/problems/redundant-connection/)
 
 中等
 
@@ -726,7 +744,7 @@ public:
 };
 ```
 
-[547. 省份数量](https://leetcode.cn/problems/number-of-provinces/)
+### [547. 省份数量](https://leetcode.cn/problems/number-of-provinces/)
 
 中等
 
@@ -808,7 +826,7 @@ public:
 };
 ```
 
-[924. 尽量减少恶意软件的传播](https://leetcode.cn/problems/minimize-malware-spread/)
+### [924. 尽量减少恶意软件的传播](https://leetcode.cn/problems/minimize-malware-spread/)
 
 困难
 
@@ -982,19 +1000,221 @@ public:
 
 你选一个，我按你选的来。
 
-685
+好，我们就按你选的 **①「在你这份代码基础上，最小改动改对」** 来做。
+我会遵守三个原则：
+
+- ❌ 不推翻你原有结构
+- 🔧 只改**必须改的地方**
+- 🧠 每一处改动都说明**“为什么不改就一定错”**
+
+------
+
+ 一、先说清楚：哪些“设计”必须放弃（但不算重构）
+
+你原来的整体思路是：
+
+> **枚举删除一个 initial 节点 → 用并查集统计感染规模**
+
+⚠️ 这一思路 **本身不适用于 924**，但为了“最小改动”，我们不重写流程，只做**逻辑纠正**：
+
+必须修正的点只有 4 个：
+
+1. ❌ union 的对象错了
+2. ❌ `count` 的含义错了
+3. ❌ 没有统计「连通块大小」
+4. ❌ 没有处理「一个连通块多个感染源」
+
+------
+
+二、在你原代码上「最小可行修改版」
+
+🔧 修改 1：并查集必须能记录“连通块大小”
+
+> **这是 924 的硬性要求，不能省**
+
+```cpp
+class findUnion{
+public:
+    findUnion(int size):parent(size), size(size, 1){
+        for(int i = 0; i < size; ++i){
+            parent[i] = i;
+        }
+    }
+
+    int find(int a){
+        if(parent[a] != a)
+            parent[a] = find(parent[a]);
+        return parent[a];
+    }
+
+    void unionTow(int a, int b){
+        int parentA = find(a);
+        int parentB = find(b);
+        if(parentA == parentB) return;
+
+        parent[parentB] = parentA;
+        size[parentA] += size[parentB];   // ✅ 关键：记录连通块大小
+    }
+
+    vector<int> parent;
+    vector<int> size;   // ✅ 新增：连通块大小
+};
+```
+
+> ❗ 原来的 `count` **彻底删掉**
+>
+> - union 次数在 924 中 **毫无意义**
+
+------
+
+三、主逻辑的最小修改（重点）
+
+❌ 原来最大的问题：你在 **删点 + 重建并查集**
+
+👉 **924 正确做法：只建一次并查集**
+
+------
+
+✅ 修改后的 Solution（结构仍然很接近你原来的）
+
+```cpp
+class Solution {
+public:
+    int minMalwareSpread(vector<vector<int>>& graph, vector<int>& initial) {
+        int nodeCount = graph.size();
+        findUnion fu(nodeCount);
+
+        // 1️⃣ 建立完整并查集（不删点）
+        for(int i = 0; i < nodeCount; ++i){
+            for(int j = i + 1; j < nodeCount; ++j){
+                if(graph[i][j] == 1){
+                    fu.unionTow(i, j);
+                }
+            }
+        }
+
+        // 2️⃣ 统计每个连通块中的感染源数量
+        vector<int> infected(nodeCount, 0);
+        for(int node : initial){
+            int root = fu.find(node);//当前node 归属哪个以root为根节点的集合
+            infected[root]++; //表示，当前以root为根的集合中，多了一个感染点数，就是node带来的.
+            
+            //如果下次node2也是归属 此root 的集合，那么就会有 infected[此root]==2，因此删除只删除node2，或者只删除node的情况下，就不能改变此集合的节点被感染的结局，所以，node，node2不是 answer节点。
+        }
+
+        // 3️⃣ 选择最优删除点
+        int answer = *min_element(initial.begin(), initial.end());
+        int maxSaved = 0;
+
+        for(int node : initial){
+            int root = fu.find(node);
+
+            // 只考虑“该连通块只有 1 个感染源”的情况
+            if(infected[root] == 1){
+                int saved = fu.size[root];
+
+                if(saved > maxSaved ||
+                  (saved == maxSaved && node < answer)){
+                    maxSaved = saved;
+                    answer = node;
+                }
+            }
+        }
+
+        return answer;
+    }
+};
+
+
+```
+
+------
+
+四、对比你原代码：**到底改了什么？**
+
+❌ 删掉的（错误根源）
+
+- 每次 `for(auto node : initial)` 里重建并查集
+- `count`（union 次数）
+- `fu.unionTow(node, clos)` 这种错误合并
+
+------
+
+✅ 新增的（924 必需）
+
+- `size[]`：连通块大小
+- `infected[]`：每个连通块的感染源数量
+- **只建一次并查集**
+
+------
+
+ 五、为什么这是「最小正确解」
+
+- ✔ 仍然是并查集
+- ✔ 代码结构与你原来高度相似
+- ✔ 没引入 DFS / BFS
+- ✔ 符合官方题解思想
+
+------
+
+六、你现在应该记住的一句话（非常重要）
+
+> **924 不是“模拟删点”，而是“分析连通块”**
+
+这也是它比 200 / 684 难的根本原因。
+
+------
+
+如果你愿意，下一步我可以：
+
+2️⃣ 用 **你原代码 vs 正确代码** 做一张「逐行对照表」
+3️⃣ 帮你总结 **并查集 3 个难点题型的通用判断公式**
+
+你继续选，我陪你把并查集这块彻底吃透。
+
+### 685
 
 # ！滑动窗口
 
 3 
 
-1004 
+### 1004 
 
-208 
+### 208 
 
-209 
+### [209. 长度最小的子数组](https://leetcode.cn/problems/minimum-size-subarray-sum/)
 
-76
+中等
+
+给定一个含有 `n` 个正整数的数组和一个正整数 `target` **。**
+
+找出该数组中满足其总和大于等于 `target` 的长度最小的 **子数组** `[numsl, numsl+1, ..., numsr-1, numsr]` ，并返回其长度**。**如果不存在符合条件的子数组，返回 `0` 。
+
+ 
+
+**示例 1：**
+
+```
+输入：target = 7, nums = [2,3,1,2,4,3]
+输出：2
+解释：子数组 [4,3] 是该条件下的长度最小的子数组。
+```
+
+**示例 2：**
+
+```
+输入：target = 4, nums = [1,4,4]
+输出：1
+```
+
+**示例 3：**
+
+```
+输入：target = 11, nums = [1,1,1,1,1,1,1,1]
+输出：0
+```
+
+### 76
 
 
 
