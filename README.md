@@ -1176,9 +1176,175 @@ public:
 
 # ！滑动窗口
 
-3 
+### [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)
 
-### 1004 
+已解答
+
+中等
+
+给定一个字符串 `s` ，请你找出其中不含有重复字符的 **最长 子串** 的长度。
+
+**示例 1:**
+
+```
+输入: s = "abcabcbb"
+输出: 3 
+解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。注意 "bca" 和 "cab" 也是正确答案。
+```
+
+**示例 2:**
+
+```
+输入: s = "bbbbb"
+输出: 1
+解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
+```
+
+**示例 3:**
+
+```
+输入: s = "pwwkew"
+输出: 3
+解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+     请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+```
+
+```C++
+class Solution { //思路没问题，就是方法不对（用例部分通过）
+public:
+    int lengthOfLongestSubstring(string s) {
+        string answer {};
+        string subStr {};
+        set<string> subStrSet{}; 
+        for(int j = 0; j < s.size(); ++j){
+            string cur {s[j]};
+            int flag = true;
+            while(subStrSet.find(cur) == subStrSet.end()){ //这儿不应该判断 == end，而是判断 != end
+                subStrSet.insert(cur);
+                subStr += cur;
+                if(subStr.size() > answer.size()){
+                    answer = subStr;
+                }
+                flag = false;
+            }
+            if(flag){
+                subStrSet.clear();
+                subStrSet.insert(cur);
+                subStr.clear();
+                subStr += cur;
+            }
+        }
+        return answer.size();
+    }
+};
+```
+
+```c++
+class Solution {// 滑动窗口
+public:
+    int lengthOfLongestSubstring(string s) {
+        if(s.size() == 0)
+            return 0;
+        unordered_set<char> strSet {};
+        int maxLen = 0;
+        int left = 0;
+        for(int j = 0; j < s.size(); ++j){
+
+            while(strSet.find(s[j]) != strSet.end()){ //如果当前s[j] 加入产生了重复的char
+                strSet.erase(s[left++]); //窗口左边界 向右滑动一格
+            }
+            strSet.insert(s[j]); // 12行 删除重复的char s[i]后， 在这儿插入 s[j]
+            maxLen = max(maxLen, j - left + 1);
+        }
+        
+        return maxLen;
+    }
+};
+```
+
+
+
+### [1004. 最大连续1的个数 III](https://leetcode.cn/problems/max-consecutive-ones-iii/)
+
+中等
+
+给定一个二进制数组 `nums` 和一个整数 `k`，假设最多可以翻转 `k` 个 `0` ，则返回执行操作后 *数组中连续 `1` 的最大个数* 。
+
+**示例 1：**
+
+```
+输入：nums = [1,1,1,0,0,0,1,1,1,1,0], K = 2
+输出：6
+解释：[1,1,1,0,0,1,1,1,1,1,1]
+粗体数字从 0 翻转到 1，最长的子数组长度为 6。
+```
+
+**示例 2：**
+
+```
+输入：nums = [0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,1,1,1], K = 3
+输出：10
+解释：[0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1]
+粗体数字从 0 翻转到 1，最长的子数组长度为 10。
+```
+
+示例1：算法图解
+
+![image-20251224200553087](C:\Users\cn_lq\AppData\Roaming\Typora\typora-user-images\image-20251224200553087.png)
+
+```c++
+class Solution { // 滑动窗口
+public:
+    int longestOnes(vector<int>& nums, int k) {
+        if(nums.size() == 0)
+            return 0;
+        int maxLen = 0;
+        int zeroCount = 0;
+        int left = 0;
+        for(int j = 0; j < nums.size(); ++j){
+            while(zeroCount > k){
+                if(nums[left] == 0)
+                    zeroCount--;
+                left++; //窗口左边界 向右滑动一格
+            }
+            if(nums[j] == 0){
+                zeroCount++;
+            }
+            if(zeroCount <= k) //当前窗口中0的个数符合最大反转阈值k 才能计算长度
+                maxLen = max(maxLen, j - left + 1);
+        }
+        return maxLen;
+    }
+};
+```
+
+```c++
+class Solution { // 公式做题就是快
+public:
+    int longestOnes(vector<int>& nums, int k) {
+        if(nums.size() == 0)
+            return 0;
+        int maxLen = 0;
+        int zeroCount = 0;
+        int left = 0;
+        for(int j = 0; j < nums.size(); ++j){
+            while(zeroCount > k){
+                if(nums[left] == 0)
+                    zeroCount--;
+                left++; //窗口左边界 向右滑动一格
+            }
+            if(nums[j] == 0){
+                zeroCount++;
+            }
+            if(zeroCount <= k) //当前窗口中0的个数符合最大反转阈值k 才能计算长度
+                maxLen = max(maxLen, j - left + 1);
+        }
+        return maxLen;
+    }
+};
+```
+
+
 
 ### 208 
 
@@ -1213,6 +1379,34 @@ public:
 输入：target = 11, nums = [1,1,1,1,1,1,1,1]
 输出：0
 ```
+
+
+
+```c++
+class Solution { //滑动窗口
+public:
+    int minSubArrayLen(int target, vector<int>& nums) {
+        int minLen = nums.size();
+        int left = 0; //窗口左边界
+        int sum = 0;
+        int flag = false;
+        for(int j = 0; j < nums.size(); ++j){ // j 窗口右边界
+            sum += nums[j];
+            while(sum >= target){
+                flag = true;
+                minLen = min(minLen, j - left + 1);
+                sum -= nums[left++]; //左边窗口边界 向右边滑动1位
+            }
+        }
+
+        if(!flag) //如果flag没有被修改，说明nums全体相加都小于target
+            return 0;
+        return minLen;
+    }
+};
+```
+
+
 
 ### 76
 
