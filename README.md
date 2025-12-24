@@ -1345,7 +1345,7 @@ public:
 
 
 
-### 208 
+
 
 ### [209. 长度最小的子数组](https://leetcode.cn/problems/minimum-size-subarray-sum/)
 
@@ -1413,7 +1413,58 @@ public:
 
 # ！前缀和
 
-560 974 523 525 437
+[560. 和为 K 的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/)
+
+中等
+
+给你一个整数数组 `nums` 和一个整数 `k` ，请你统计并返回 *该数组中和为 `k` 的子数组的个数* 。
+
+子数组是数组中元素的连续非空序列。
+
+**示例 1：**
+
+```
+输入：nums = [1,1,1], k = 2
+输出：2
+```
+
+**示例 2：**
+
+```
+输入：nums = [1,2,3], k = 3
+输出：2
+```
+
+```c++
+class Solution {//暴力（超时）
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        int count = 0;
+        int sum = 0;
+        for(int j = 0; j < nums.size(); ++j){
+            for(int i = j; i < nums.size(); ++i){
+                sum +=nums[i];
+                if(sum == k)
+                    count++;
+            }
+            sum = 0;
+        }
+        return count;
+    }
+};
+```
+
+
+
+
+
+974 
+
+523 
+
+525 
+
+437
 
 
 
@@ -1459,7 +1510,188 @@ public:
 
 # 字典树
 
-820 648 208 140 1032
+820 
+
+648 
+
+### [208. 实现 Trie (前缀树)](https://leetcode.cn/problems/implement-trie-prefix-tree/)
+
+中等
+
+**[Trie](https://baike.baidu.com/item/字典树/9825209?fr=aladdin)**（发音类似 "try"）或者说 **前缀树** 是一种树形数据结构，用于高效地存储和检索字符串数据集中的键。这一数据结构有相当多的应用情景，例如自动补全和拼写检查。
+
+请你实现 Trie 类：
+
+- `Trie()` 初始化前缀树对象。
+- `void insert(String word)` 向前缀树中插入字符串 `word` 。
+- `boolean search(String word)` 如果字符串 `word` 在前缀树中，返回 `true`（即，在检索之前已经插入）；否则，返回 `false` 。
+- `boolean startsWith(String prefix)` 如果之前已经插入的字符串 `word` 的前缀之一为 `prefix` ，返回 `true` ；否则，返回 `false` 。
+
+**示例：**
+
+```
+输入
+["Trie", "insert", "search", "search", "startsWith", "insert", "search"]
+[[], ["apple"], ["apple"], ["app"], ["app"], ["app"], ["app"]]
+输出
+[null, null, true, false, true, null, true]
+
+解释
+Trie trie = new Trie();
+trie.insert("apple");
+trie.search("apple");   // 返回 True
+trie.search("app");     // 返回 False
+trie.startsWith("app"); // 返回 True
+trie.insert("app");
+trie.search("app");     // 返回 True
+```
+
+
+
+```c++
+class Trie {//什么try树，不懂。我这个是hash树
+public:
+    Trie():box() {
+        return;
+    }
+    
+    void insert(string word) {
+        box.insert(word);
+    }
+    
+    bool search(string word) {
+        if(box.find(word) != box.end())
+            return true;
+        return false;   
+    }
+    
+    bool startsWith(string prefix) {
+        if(search(prefix))
+            return true;
+        
+        int size = prefix.size();
+        for(auto word: box){
+            if(word.size() <= size) continue;
+            for(int i = 0; i < size; ++i){
+                if(word[i] == prefix[i]){
+                    if(i == size-1){
+                        return true;
+                    }
+                    continue;
+                } else{
+                    break;
+                }
+            }
+
+        }
+        return false;
+    }
+    unordered_set<string> box;
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
+```
+
+
+
+```c++
+class Trie {//标准解法 (gpt解法)
+private:
+    // Trie 中的每一个节点
+    struct TrieNode {
+        // children[i] 表示当前节点的第 i 个子节点
+        // i = 0 -> 'a', i = 25 -> 'z'
+        TrieNode* children[26];
+
+        // 标记：是否有单词在此结束
+        bool isEnd;
+
+        TrieNode() : isEnd(false) {
+            // 初始化所有孩子指针为空
+            for (int i = 0; i < 26; ++i)
+                children[i] = nullptr;
+        }
+    };
+
+    // Trie 的根节点（不存任何字符）
+    TrieNode* root;
+
+public:
+    /** Initialize your data structure here. */
+    Trie() {
+        root = new TrieNode();
+    }
+    
+    /** Inserts a word into the trie. */
+    void insert(string word) {
+        TrieNode* cur = root;
+
+        // 从第一个字符开始逐个插入
+        for (char c : word) {
+            int index = c - 'a';
+
+            // 如果对应子节点不存在，就新建
+            if (cur->children[index] == nullptr) {
+                cur->children[index] = new TrieNode();
+            }
+
+            // 向下走一层
+            cur = cur->children[index];
+        }
+
+        // 单词完整插入完毕，在最后一个节点打标记
+        cur->isEnd = true;
+    }
+    
+    /** Returns if the word is in the trie. */
+    bool search(string word) {
+        TrieNode* cur = root;
+
+        for (char c : word) {
+            int index = c - 'a';
+
+            // 如果路径断了，说明不存在这个单词
+            if (cur->children[index] == nullptr)
+                return false;
+
+            cur = cur->children[index];
+        }
+
+        // 必须是一个“完整单词”结尾
+        return cur->isEnd;
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    bool startsWith(string prefix) {
+        TrieNode* cur = root;
+
+        for (char c : prefix) {
+            int index = c - 'a';
+
+            // 只要路径断了，说明没有任何单词以该前缀开头
+            if (cur->children[index] == nullptr)
+                return false;
+
+            cur = cur->children[index];
+        }
+
+        // 能完整走完 prefix，就一定存在以它为前缀的单词
+        return true;
+    }
+};
+```
+
+
+
+140 
+
+1032
 
 # 哈希
 
