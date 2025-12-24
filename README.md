@@ -1289,7 +1289,7 @@ public:
 ```
 
 示例1：算法图解
-![1004.png](D:\gitHubCode\algorithmProject\滑动窗口\1004.png)
+![1004.png](.\滑动窗口\1004.png)
 
 ```c++
 class Solution { // 滑动窗口
