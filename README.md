@@ -1289,8 +1289,7 @@ public:
 ```
 
 示例1：算法图解
-
-![image-20251224200553087](C:\Users\cn_lq\AppData\Roaming\Typora\typora-user-images\image-20251224200553087.png)
+![1004.png](D:\gitHubCode\algorithmProject\滑动窗口\1004.png)
 
 ```c++
 class Solution { // 滑动窗口
