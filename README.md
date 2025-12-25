@@ -543,6 +543,8 @@ public:
 解释：最大矩形如上图所示。
 ```
 
+![img](./单调栈/85压缩矩阵.png)
+
 ```c++
 class Solution {
 public:
@@ -559,26 +561,26 @@ public:
                     heights[j] = 0;
                 }
             }
-            answer = max(answer, curRow(heights));
+            answer = max(answer, largestRectangleArea(heights));
         }
         return answer;
     }
 
-    int curRow(vector<int> &heights){
+    int largestRectangleArea(vector<int>& heights) {
         heights.emplace_back(0);
-        int area = 0;
-        stack<int> sk;
+        stack<int> st;
+        int answer = 0;
         for(int i = 0; i < heights.size(); ++i){
-            while(!sk.empty() && heights[i] < heights[sk.top()]){
-                int h = heights[sk.top()];
-                sk.pop();
-                int left = sk.empty() ? -1 : sk.top();
-                int wieth = i - left -1;
-                area = max(area, h*wieth);
+            while(!st.empty() && heights[i] < heights[st.top()]){ 
+                int h = heights[st.top()]; //高
+                st.pop();
+                int left = st.empty() ? -1 : st.top();
+                int width = i - left - 1; //底
+                answer = max(answer, width*h);
             }
-            sk.push(i);
+            st.push(i);
         }
-        return area;
+        return answer;
     }
 };
 ```
