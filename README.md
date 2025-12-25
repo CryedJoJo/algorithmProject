@@ -293,12 +293,17 @@ public:
         vector<int> answer(temperatures.size(), 0);
         stack<int> stk;
         for(int i = 0; i < temperatures.size(); i++){
-            while(!stk.empty() && temperatures[stk.top()] < temperatures[i]){ //循环判断栈顶位置温度是否小于i位置温度
+             //循环判断栈顶位置温度是否小于i位置温度
+            while(!stk.empty() && temperatures[stk.top()] < temperatures[i]){ 
+                
                 int pos = stk.top(); //栈顶，pos对应temperatures下标
+                
                 stk.pop(); //弹出栈顶，用于while循环判断栈顶下一个位是否满足条件
+        
                 answer[pos] = i - pos; //计算temperatures的pos位 与之后最近高温的距离
             }
-            stk.push(i); //i压入stk，说明i位置之前其他小于i位置温度的温度都找到了第一个比自己大的温度，留着栈中的位置都是大于i位置温度的温度
+            stk.push(i); //i压入stk，说明i位置之前其他小于i位置温度的温度都找到了第一个比自己大的温度，
+            //留在栈中的位置的温度都是大于i位置温度的温度
         }
         return answer;
     }
