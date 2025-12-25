@@ -492,6 +492,10 @@ public:
 
 
 
+heights[<span style=color:red>**i**</span>] 连续升高就st.push(<span style=color:red>**i**</span>), 突然下降就循环判断，并修正<span style=color:red> **i** </span>位置之前的最大矩形面积
+
+![img](./单调栈/84柱状图中最大的矩形-单调栈.png)
+
 ```c++
 class Solution {//单调栈
 public:
@@ -514,7 +518,6 @@ public:
         return answer;
     }
 };
-
 ```
 
 
