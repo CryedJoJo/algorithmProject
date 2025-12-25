@@ -499,7 +499,7 @@ heights[<span style=color:red>**i**</span>] 连续升高就st.push(<span style=c
 class Solution {//单调栈
 public:
     int largestRectangleArea(vector<int>& heights) {
-        heights.emplace_back(0);
+        heights.emplace_back(0); //它的作用不是参与答案计算，是防止传入数组单调递增数组，导致无法弹栈
         stack<int> st;
         int answer = 0;
         for(int i = 0; i < heights.size(); ++i){
@@ -508,7 +508,7 @@ public:
             while(!st.empty() && heights[i] < heights[st.top()]){ 
                 int h = heights[st.top()]; //高
                 st.pop();
-                int left = st.empty() ? -1 : st.top();
+                int left = st.empty() ? -1 : st.top(); //st为空时，说明上面弹出的是最后一个元素，流程图2
                 int width = i - left - 1; //底
                 answer = max(answer, width*h);
             }
@@ -551,16 +551,24 @@ public:
     int maximalRectangle(vector<vector<char>>& matrix) {
         int row = matrix.size();
         int clo = matrix[0].size();
+        // heights[j] 表示：以“当前行 i 作为底边”，第 j 列向上连续出现 '1' 的高度
         vector<int> heights(clo, 0);
+        // 用来记录整个矩阵中能够形成的最大矩形面积
         int answer = 0;
+
         for(int i = 0; i < row; ++i){
             for(int j = 0; j < clo; ++j){
                 if(matrix[i][j] == '1'){
+                    // 当前列的高度可以在上一行基础上 +1表示向上连续的 '1' 又增加了一层
                     heights[j]++;
                 } else {
+                    // 说明在这一列上连续的 '1' 被中断 以当前行作为底边时，该列高度清零
                     heights[j] = 0;
                 }
             }
+
+            // 到这里 heights 数组已经表示 “以第 i 行为底边的柱状图高度”
+            // 在这个柱状图中，计算能够形成的最大矩形面积
             answer = max(answer, largestRectangleArea(heights));
         }
         return answer;
@@ -583,6 +591,7 @@ public:
         return answer;
     }
 };
+
 ```
 
 
