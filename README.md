@@ -1,5 +1,7 @@
 discription：This project is created to document my journey of practicing LeetCode algorithm questions while preparing for the huawei od position.
 
+git status;git add .;git commit -m "update";git push;
+
 # ！递归
 
 ### <span style=color:red>70.爬楼梯</span>
