@@ -242,6 +242,15 @@ public:
 
 # ！单调栈
 
+关键词（90% 单调栈）
+- 下一个更大元素
+- 下一个更小元素
+- 最近的更大 / 更小
+- 左边第一个
+- 右边第一个
+- 单调递增 / 递减
+- 能看到多少个
+
 ### <span style=color:red>739. 每日温度</span>
 
 (https://leetcode.cn/problems/daily-temperatures/)
@@ -322,8 +331,6 @@ public:
 
 数字 `x` 的 **下一个更大的元素** 是按数组遍历顺序，这个数字之后的第一个比它更大的数，这意味着你应该循环地搜索它的下一个更大的数。如果不存在，则输出 `-1` 。
 
- 
-
 **示例 1:**
 
 ```
@@ -333,8 +340,6 @@ public:
 数字 2 找不到下一个更大的数； 
 第二个 1 的下一个最大的数需要循环搜索，结果也是 2。
 ```
-
-
 
 ```c++
 class Solution {//单调栈
@@ -356,6 +361,76 @@ public:
                 int pos = stk.top();
                 stk.pop();
                 answer[pos] = nums[i];
+            }
+        }
+        return answer;
+    }
+};
+```
+**“为什么一定要第二轮？没有第二轮遍历，就无法处理“下一个更大元素在当前位置左侧”的情况**
+而 503 是 **环形数组**，左侧 ≠ 不存在。为什么“第二轮”正好补上这个漏洞？
+第二轮本质是：让右侧走不到的元素，能“看到”数组左侧
+
+给一个更“极端”的失败用例
+```text
+nums = [5, 4, 3, 2, 1]
+```
+
+正确答案：
+```text
+[-1, 5, 5, 5, 5]
+```
+只用一轮的结果
+
+```text
+stk = [0, 1, 2, 3, 4]
+answer = [-1, -1, -1, -1, -1]
+```
+原因：
+所有元素都是单调递减
+没有任何一个元素在右侧能被弹栈
+但在环形数组中：
+4 的下一个更大是 5
+3 的下一个更大是 5
+…
+全部漏算
+
+失败的“本质原因”（非常重要）
+单调栈的“下一个更大元素”前提是：你能“看到”目标元素
+在普通数组中：右边就是全部候选
+在环形数组中：右边 + 左边 才是全部候选
+但你的第一轮遍历只能看到：当前位置右侧
+第二轮的本质是：补齐“左侧那一半”
+为什么不能“在一轮里硬算”？
+因为单调栈的一个核心前提是：每个元素入栈时，它后面所有“可能成为答案的元素”还没出现
+在环形数组中：有些答案 已经出现过了。只能靠“再走一圈”补救
+一句话总结（你可以直接记）503 之所以必须第二轮，是因为环形数组中“下一个更大元素”可能在左侧，而单次遍历只能看到右侧。
+
+**ChatGpt 版本：**
+
+```c++
+class Solution {// 单调栈
+public:
+    vector<int> nextGreaterElements(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> answer(n, -1);
+        stack<int> stk;  // 单调递减栈，存的是下标
+
+        // 遍历两遍数组，模拟环形数组
+        for(int i = 0; i < 2 * n; ++i){
+            int idx = i % n;
+
+            // 当前元素比栈顶元素大，说明找到了“下一个更大元素”
+            while(!stk.empty() && nums[stk.top()] < nums[idx]){
+                int pos = stk.top();
+                stk.pop();
+                answer[pos] = nums[idx];
+            }
+
+            // 只在第一轮遍历时入栈
+            // 第二轮只是用来“结算”还没找到更大元素的下标
+            if(i < n){
+                stk.push(idx);
             }
         }
         return answer;
@@ -387,28 +462,26 @@ public:
 解释：最大的矩形为图中红色区域，面积为 10
 ```
 
-
+![img](./单调栈/84柱状图中最大的矩形.png)
 
 ```c++
 class Solution {//暴力
 public:
     int largestRectangleArea(vector<int>& heights) {
-        int answer = 0;
-        int flowCount;
-        for(int i = 0; i < heights.size(); ++i){
-            flowCount = 0;
-            for(int j = 0; j < heights.size(); ++j){
-                if(heights[j] >= heights[i]){
-                    flowCount++;
+        int answer = 0; //最大面积
+        for(int j = 0; j < heights.size(); ++j){
+            
+            int width = 0;//i位置 及i位置之后 连续大于等于heights[i]（高）的 元素个数 (底边长) 
+            int h = heights[j]
+            for(int i = j; i < heights.size(); ++i){
+                if(heights[i] >= h){
+                    width++; //底边长++
                 } else {
-                    flowCount = 0;
+                    width = 0; //以heights[i]为（高）的连续位置结束
                 }
-                int curAnswer = flowCount * heights[i];
-                if(curAnswer > answer){
-                    answer = curAnswer;
-                }
+                answer = max(answer, width*h); // 判断当前 底*高 大不大 
             }
-
+            
         }
         return answer;
     }
@@ -425,12 +498,14 @@ public:
         stack<int> st;
         int answer = 0;
         for(int i = 0; i < heights.size(); ++i){
-            while(!st.empty() && heights[i] < heights[st.top()]){
-                int h = heights[st.top()];
+            // heights[i] < heights[st.top()]条件 的功能 类似执行 width = 0; 之前的边界条件
+            // 类似暴力解中 width 筛选连续满足 heights[i] >= heights[j]（高）底边个数的过程
+            while(!st.empty() && heights[i] < heights[st.top()]){ 
+                int h = heights[st.top()]; //高
                 st.pop();
                 int left = st.empty() ? -1 : st.top();
-                int width = i - left - 1;
-                answer = max(answer, h*width);
+                int width = i - left - 1; //底
+                answer = max(answer, width*h);
             }
             st.push(i);
         }
