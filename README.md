@@ -701,7 +701,7 @@ public:
 
     int find(int elem){
         if(parent[elem] != elem)
-            parent[elem] = find(parent[elem]); //当上曹丞相，一人之下、万人之上
+            parent[elem] = find(parent[elem]); //都想当丞相，一人之下、万人之上
         return parent[elem];
     }
 
