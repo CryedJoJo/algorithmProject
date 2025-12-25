@@ -692,7 +692,7 @@ class unionFind{//并查集
 public:
     unionFind(int size):parent(size),count(0){
         for(int pos = 0; pos < size; ++pos)
-            parent[pos] = pos; //东汉末年，天下大乱，凡地方强权皆各自为战
+            parent[pos] = pos; //东汉末年，天下大乱，诸侯各自为战
     }
 
     void setCount(int num){
@@ -702,7 +702,7 @@ public:
     int find(int elem){
         if(parent[elem] != elem)
             parent[elem] = find(parent[elem]); //都想当丞相，一人之下、万人之上
-        return parent[elem];
+        return parent[elem]; //挟天子以令诸侯
     }
 
     void unionTow(int a, int b){
@@ -710,8 +710,8 @@ public:
         int parentB = find(b); //统帅三军 和兵一处，决一死战
         if(parentA == parentB) return;
 
-        parent[parentB] = parentA; //合谋或是吞并？夷陵之战 三足鼎立
-        count--; //不是你死 就是我亡
+        parent[parentB] = parentA; //分久必合
+        count--; //被吞并
     }
 
     vector<int> parent;
