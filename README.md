@@ -40,7 +40,7 @@ public:
             case 5: return 8;
             case 6: return 13;
             case 7: return 21;
-            case 8: return 34;
+            case 8: return 34; //不这样写，用例过不了
             default:
         }
         return climbStairs(n-1) + climbStairs(n - 2);
@@ -51,9 +51,7 @@ public:
 
 
 ```c++
-#include <vector>
-
-class Solution {//DP 动态规划
+class Solution {//DP 动态规划（根据思路自己实现的，但是初始条件写得不够好 需要优化
 public:
     int climbStairs(int n) {
         /*
@@ -1259,8 +1257,6 @@ public:
 
 ### [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)
 
-已解答
-
 中等
 
 给定一个字符串 `s` ，请你找出其中不含有重复字符的 **最长 子串** 的长度。
@@ -1494,7 +1490,7 @@ public:
 
 # ！前缀和
 
-[560. 和为 K 的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/)
+### [560. 和为 K 的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/)
 
 中等
 
@@ -1551,43 +1547,147 @@ public:
 
 # ！差分
 
-1094 1109 121 122 1074
+### [1094. 拼车](https://leetcode.cn/problems/car-pooling/)
 
+中等
+车上最初有 `capacity` 个空座位。车 **只能** 向一个方向行驶（也就是说，**不允许掉头或改变方向**）
+给定整数 `capacity` 和一个数组 `trips` ,  `trips[i] = [numPassengersi, fromi, toi]` 表示第 `i` 次旅行有 `numPassengersi` 乘客，接他们和放他们的位置分别是 `fromi` 和 `toi` 。这些位置是从汽车的初始位置向东的公里数。
+当且仅当你可以在所有给定的行程中接送所有乘客时，返回 `true`，否则请返回 `false`。
+
+**例 1：**
+
+```
+输入：trips = [[2,1,5],[3,3,7]], capacity = 4
+输出：false
+```
+**示例 2：**
+
+```
+输入：trips = [[2,1,5],[3,3,7]], capacity = 5
+输出：true
+```
+
+![img](./差分/1094拼车.png)
+
+```c++
+class Solution { //暴力
+public:
+    bool carPooling(vector<vector<int>>& trips, int capacity) {
+        int curPassengerCount = 0; //乘客数量
+        for(int i = 0; i < trips.size(); ++i){
+            curPassengerCount = trips[i][0]; //获取当前旅行的乘客数量
+            if(curPassengerCount > capacity) return false; //一开始人就超了，拼车返回失败
+            for(int j = 0; j < trips.size(); ++j){
+                if(i == j) continue; //如果是同一趟旅行，忽略不计算
+
+                //[[2,1,5],[3,3,7]] 中 trips[i][2] == 5。  3 < 5 <= 7会导致旅程重叠
+                if(trips[i][2] > trips[j][1] && trips[i][2] <= trips[j][2]){
+                    curPassengerCount += trips[j][0];
+                    if(curPassengerCount > capacity)
+                        return false; //人数 > 座位，拼车失败
+                }
+
+            }
+        }
+        return true;
+    }
+};
+```
+
+
+
+
+
+1109 
+
+121 
+
+122 
+
+1074
 
 
 # 拓扑排序
 
-210 269 2050
+210 
+
+269 
+
+2050
 
 
 
 # ！字符串
 
-20 5 43 8 32 
+20 
+
+5 
+
+43
+
+8 
+
+32 
 
 
 
 # 二分查找
 
-33 34 300 
+33 
+
+34 
+
+300 
 
 
 
 # ！BFS
 
-752 210 127 317 815
+752 
+
+210 
+
+127 
+
+317 
+
+815
 
 # ！DFS，回溯
 
-46 130 547 17 332 
+46 
+
+130 
+
+547 
+
+17 
+
+332 
 
 # 动态规划
 
-139 122 62 64 871 
+139 
+
+122 
+
+62 
+
+64 
+
+871 
 
 # 贪心
 
-45 452 435 621 135
+45 
+
+452 
+
+435
+
+621 
+
+135
 
 # 字典树
 
@@ -1776,13 +1876,37 @@ public:
 
 # 哈希
 
-554 781 846 460 1224
+554 
+
+781 
+
+846 
+
+460 
+
+1224
 
 # ！双指针
 
-11 15 42 18 1163
+11 
+
+15 
+
+42 
+
+18 
+
+1163
 
 # ！栈
 
-71 394 1190 84 224
+71 
+
+394 
+
+1190 
+
+84 
+
+224
 
