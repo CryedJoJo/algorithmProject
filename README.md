@@ -1880,7 +1880,77 @@ public:
 
 # 二分查找
 
-33 
+### [33. 搜索旋转排序数组](https://leetcode.cn/problems/search-in-rotated-sorted-array/)
+
+中等
+
+整数数组 `nums` 按升序排列，数组中的值 **互不相同** 。
+
+在传递给函数之前，`nums` 在预先未知的某个下标 `k`（`0 <= k < nums.length`）上进行了 **向左旋转**，使数组变为 `[nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]`（下标 **从 0 开始** 计数）。例如， `[0,1,2,4,5,6,7]` 下标 `3` 上向左旋转后可能变为 `[4,5,6,7,0,1,2]` 。
+
+给你 **旋转后** 的数组 `nums` 和一个整数 `target` ，如果 `nums` 中存在这个目标值 `target` ，则返回它的下标，否则返回 `-1` 。
+
+你必须设计一个时间复杂度为 `O(log n)` 的算法解决此问题。
+
+**示例 1：**
+
+```
+输入：nums = [4,5,6,7,0,1,2], target = 0
+输出：4
+```
+
+**示例 2：**
+
+```
+输入：nums = [4,5,6,7,0,1,2], target = 3
+输出：-1
+```
+
+**示例 3：**
+
+```
+输入：nums = [1], target = 0
+输出：-1
+```
+
+**提示：**
+
+- `1 <= nums.length <= 5000`
+- `-104 <= nums[i] <= 104`
+- `nums` 中的每个值都 **独一无二**
+- 题目数据保证 `nums` 在预先未知的某个下标上进行了旋转
+- `-104 <= target <= 104`
+
+```c++
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int kk = 0;
+        int pre = 0; //记录i-1 位置
+        for(int i = 0; i < nums.size(); ++i){
+            if(nums[i] < nums[pre]){ //不能直接用nums[i-1]、nums[i+1] 因为可能越界
+                kk = pre; //i-1
+                break;
+            }
+            pre = i;
+        }
+        auto it = nums.begin();
+        // bool judge = binary_search(Iterator1, Iterator2, target); //判断存在性
+        auto left = lower_bound(it, it+kk, target); //lower_bound 返回第一个 >= target的迭代器
+        if(left != nums.end() && *left == target){
+            return left - nums.begin(); //iterator - iterator 结果是迭代器的距离
+        }
+        auto right = lower_bound(nums.begin()+kk+1, nums.end(), target);
+        if(right != nums.end() && *right == target){
+            return right - nums.begin();
+        }
+        return -1;
+    }
+};
+```
+
+tips:
+
 
 34 
 
@@ -1901,6 +1971,18 @@ public:
 815
 
 # ！DFS，回溯
+
+某些纯 暴力解 都不能解决的问题，可能就需要用回溯算法了（回溯 就是递归返回时的地方，回溯就在递归中）。
+回溯也是暴力算法。
+
+适用回溯算法的问题有那些：
+组合问题、排列问题、切割问题、子集问题、棋盘问题
+
+如何理解回溯法：
+1、回溯法都适用n叉树模型
+2、回溯的递归函数一遍没有返回值类型
+3、终止条件一般在叶子节点，也就是递归出口
+4、
 
 46 
 
