@@ -4,11 +4,7 @@ git status;git add .;git commit -m "update";git push;
 
 # ！递归
 
-### <span style=color:red>70.爬楼梯</span>
-
-(https://leetcode.cn/problems/climbing-stairs/) 
-
-<span style=color:red></span>
+### [70.爬楼梯](https://leetcode.cn/problems/climbing-stairs/) 
 
 简单
 
@@ -81,9 +77,7 @@ public:
 };
 ```
 
-### <span style=color:red>509. 斐波那契数</span>
-
-(https://leetcode.cn/problems/fibonacci-number/)
+### [509. 斐波那契数](https://leetcode.cn/problems/fibonacci-number/)
 
 简单
 
@@ -149,9 +143,7 @@ public:
 
 ### 169 
 
-### <span style=color:red>240. 搜索二维矩阵 II</span>
-
-(https://leetcode.cn/problems/search-a-2d-matrix-ii/)
+### [240. 搜索二维矩阵 II](https://leetcode.cn/problems/search-a-2d-matrix-ii/)
 
 中等
 
@@ -251,9 +243,7 @@ public:
 - 单调递增 / 递减
 - 能看到多少个
 
-### <span style=color:red>739. 每日温度</span>
-
-(https://leetcode.cn/problems/daily-temperatures/)
+### [739. 每日温度](https://leetcode.cn/problems/daily-temperatures/)
 
 中等
 
@@ -321,9 +311,7 @@ public:
 
 
 
-### <span style=color:red>503. 下一个更大元素 II</span>
-
-(https://leetcode.cn/problems/next-greater-element-ii/)
+### [503. 下一个更大元素 II](https://leetcode.cn/problems/next-greater-element-ii/)
 
 中等
 
@@ -440,9 +428,7 @@ public:
 
 
 
-### <span style=color:red>84. 柱状图中最大的矩形</span>
-
-(https://leetcode.cn/problems/largest-rectangle-in-histogram/)
+### [84. 柱状图中最大的矩形](https://leetcode.cn/problems/largest-rectangle-in-histogram/)
 
 困难
 
@@ -489,7 +475,7 @@ public:
 ```
 
 
-heights[<span style=color:red>**i**</span>] 连续升高就st.push(<span style=color:red>**i**</span>), 突然下降就循环判断，并修正<span style=color:red> **i** </span>位置之前的最大矩形面积
+heights[[**i**]] 连续升高就st.push([**i**]), 突然下降就循环判断，并修正[ **i** ]位置之前的最大矩形面积
 
 ![img](./单调栈/84柱状图中最大的矩形-单调栈.png)
 
@@ -519,9 +505,7 @@ public:
 
 
 
-### <span style=color:red>85. 最大矩形</span>
-
-(https://leetcode.cn/problems/maximal-rectangle/)
+### [85. 最大矩形](https://leetcode.cn/problems/maximal-rectangle/)
 
 已解答
 
@@ -633,9 +617,7 @@ H4 --> H5[选择最优答案]
 G -- 否 --> Y[需进一步分析题目<br/>并查集可能不是最佳方案]
 ```
 
-### <span style=color:red>200. 岛屿数量</span>
-
-(https://leetcode.cn/problems/number-of-islands/)
+### [200. 岛屿数量](https://leetcode.cn/problems/number-of-islands/)
 
 中等
 
@@ -760,9 +742,7 @@ public:
 
 
 
-### <span style=color:red>684. 冗余连接</span>
-
-(https://leetcode.cn/problems/redundant-connection/)
+### [684. 冗余连接](https://leetcode.cn/problems/redundant-connection/)
 
 中等
 
