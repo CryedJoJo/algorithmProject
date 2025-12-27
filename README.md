@@ -1531,9 +1531,34 @@ public:
 };
 ```
 
+```c++
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        vector<int> prefix(nums.size() + 1, 0); // 多加1个空间，是为了prefix[0] = 0,方便计算
+        for (int i = 0; i < nums.size(); ++i) {
+            prefix[i+1] = prefix[i] + nums[i]; // 计算前缀和数组
+        }
 
+        int count = 0;
+        unordered_map<int, int> prefixCount; // 存储前缀和 -> 出现次数
+        prefixCount[0] = 1; // 关键：处理从开头开始的子数组（如 [0,1] 和为 k）
 
+        for (int i = 1; i < prefix.size(); ++i) {
+            // 查看是否存在前缀和为 (prefix[i] - k)
+            // 如果存在，说明有子数组和为 k
+            if (prefixCount.find(prefix[i] - k) != prefixCount.end()) {
+                count += prefixCount[prefix[i] - k];
+            }
 
+            // 将当前前缀和加入哈希表（用于后续判断）
+            prefixCount[prefix[i]]++;
+        }
+
+        return count;
+    }
+};
+```
 
 974 
 
@@ -1581,6 +1606,7 @@ public:
                 if(i == j) continue; //如果是同一趟旅行，忽略不计算
 
                 //[[2,1,5],[3,3,7]] 中 trips[i][2] == 5。  3 < 5 <= 7会导致旅程重叠
+                // 如上图中黄色旅行[4,9,12] 蓝色旅行[6,4,12] 需要将不等式写成 4(蓝) < 12(黄) <= 12(蓝)
                 if(trips[i][2] > trips[j][1] && trips[i][2] <= trips[j][2]){
                     curPassengerCount += trips[j][0];
                     if(curPassengerCount > capacity)
@@ -1590,6 +1616,40 @@ public:
             }
         }
         return true;
+    }
+};
+```
+
+![img](./差分/1094拼车差分.png)
+
+```c++
+class Solution {
+public:
+    bool carPooling(vector<vector<int>>& trips, int capacity) {
+        // diff[i] 表示：在第 i 个位置，乘客数量的“变化量”
+        // 上车 +x，下车 -x
+        vector<int> diff(1001, 0);
+
+        // 1️⃣ 构建差分数组
+        for (int i = 0; i < trips.size(); ++i) {
+            int passengerCount = trips[i][0];
+            int from = trips[i][1];
+            int to = trips[i][2];
+            // 在 from 位置上车
+            diff[from] += passengerCount;
+            // 在 to 位置下车
+            diff[to] -= passengerCount;
+        }
+
+        // 2️⃣ 还原每个时刻的车上人数，并检查是否超载
+        int curPassengerCount = 0;
+        for (int pos = 0; pos <= 1000; ++pos) {
+            curPassengerCount += diff[pos];  // 累加变化量
+            if (curPassengerCount > capacity) {
+                return false; // 任意时刻超载，拼车失败
+            }
+        }
+        return true; // 全程未超载
     }
 };
 ```
@@ -1609,7 +1669,171 @@ public:
 
 # 拓扑排序
 
-210 
+
+代码
+
+
+
+测试用例
+
+测试用例
+
+
+
+测试结果
+
+### [210. 课程表 II](https://leetcode.cn/problems/course-schedule-ii/)
+
+中等
+
+现在你总共有 `numCourses` 门课需要选，记为 `0` 到 `numCourses - 1`。给你一个数组 `prerequisites` ，其中 `prerequisites[i] = [ai, bi]` ，表示在选修课程 `ai` 前 **必须** 先选修 `bi` 。
+
+- 例如，想要学习课程 `0` ，你需要先完成课程 `1` ，我们用一个匹配来表示：`[0,1]` 。
+
+返回你为了学完所有课程所安排的学习顺序。可能会有多个正确的顺序，你只要返回 **任意一种** 就可以了。如果不可能完成所有课程，返回 **一个空数组** 。
+
+ 
+
+**示例 1：**
+
+```
+输入：numCourses = 2, prerequisites = [[1,0]]
+输出：[0,1]
+解释：总共有 2 门课程。要学习课程 1，你需要先完成课程 0。因此，正确的课程顺序为 [0,1] 。
+```
+
+**示例 2：**
+
+```
+输入：numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]
+输出：[0,2,1,3]
+解释：总共有 4 门课程。要学习课程 3，你应该先完成课程 1 和课程 2。并且课程 1 和课程 2 都应该排在课程 0 之后。
+因此，一个正确的课程顺序是 [0,1,2,3] 。另一个正确的排序是 [0,2,1,3] 。
+```
+
+**示例 3：**
+
+```
+输入：numCourses = 1, prerequisites = []
+输出：[0]
+```
+
+ 
+
+**提示：**
+
+- `1 <= numCourses <= 2000`
+- `0 <= prerequisites.length <= numCourses * (numCourses - 1)`
+- `prerequisites[i].length == 2`
+- `0 <= ai, bi < numCourses`
+- `ai != bi`
+- 所有`[ai, bi]` **互不相同**
+
+```c++
+class Solution { //思路没问题，就是细节有错误
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        unordered_map<int, unordered_set<int>> table;
+        unordered_map<int, vector<int>> cln;
+
+
+        for(vector<int> edge : prerequisites){ //构建邻接表
+            if(table.find(edge[0]) == table.end()){
+                unordered_set<int> cur;
+                cur.insert(edge[1]);
+                table[edge[0]] = cur;
+            } else {
+                table[edge[0]].insert(edge[1]);
+            }
+            if(cln.find(edge[1]) == cln.end()){
+                vector<int> cur;
+                cur.push_back(edge[0]);
+                cln[edge[1]] = cur;
+            } else {
+                cln[edge[1]].push_back(edge[0]);
+            }
+
+        }
+
+        vector<int> seq;
+        int i = 0;
+        while(!table.empty()){
+            if(table.find(i) == table.end()){
+                seq.push_back(i);
+                for(auto next:cln[i]){
+                    table[next].erase(i);
+                    if(table[next].empty()){
+                        table.erase(next);
+                    }
+                }
+                cln.erase(i);
+            } else{
+                i++;
+                if(i == numCourses) i = 0;
+            }
+        }
+        return seq;
+    }
+};
+```
+
+GPT 修正版本
+chatGPT说：“我只做三件事
+❌ 不再用「while + i++ 瞎扫」
+✅ 显式维护「当前入度为 0 的点」
+❌ 不引入全新算法（仍然是你这套删除依赖的逻辑）”
+
+```c++
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        unordered_map<int, unordered_set<int>> table; // course -> prerequisites
+        unordered_map<int, vector<int>> cln; // course -> next courses，用于清除next courses入度
+
+        // 建图
+        for (auto& edge : prerequisites) {
+            table[edge[0]].insert(edge[1]);
+            cln[edge[1]].push_back(edge[0]);
+        }
+
+        vector<int> seq;
+        queue<int> q; //✅加入辅助队列 显式维护「当前入度为 0 的点」（这个是gpt新加的）
+
+        // 找所有“当前没有前置依赖”的课程
+        for (int i = 0; i < numCourses; ++i) {
+            if (table.find(i) == table.end()) {
+                q.push(i);
+            }
+        }
+
+        while (!q.empty()) {
+            int cur = q.front();
+            q.pop();
+            seq.push_back(cur);
+
+            // cur 作为前置课程，影响后续课程
+            if (cln.count(cur)) {
+                for (int next : cln[cur]) {
+                    table[next].erase(cur); //next课程清除入度，curCourse->nextCourse
+                    if (table[next].empty()) {
+                        table.erase(next); //nextCourse入度为0，意味着可以选修了
+                        q.push(next);
+                    }
+                }
+            }
+        }
+
+        // 如果还有课程没被加入，说明有环
+        if (seq.size() != numCourses)
+            return {};
+
+        return seq;
+    }
+};
+
+```
+
+
 
 269 
 
@@ -1619,7 +1843,50 @@ public:
 
 # ！字符串
 
-20 
+### [20. 有效的括号](https://leetcode.cn/problems/valid-parentheses/)
+
+简单
+给定一个只包括 `'('`，`')'`，`'{'`，`'}'`，`'['`，`']'` 的字符串 `s` ，判断字符串是否有效。
+
+有效字符串需满足：
+
+1. 左括号必须用相同类型的右括号闭合。
+2. 左括号必须以正确的顺序闭合。
+3. 每个右括号都有一个对应的相同类型的左括号。 
+
+**示例 1：**
+
+**输入：**s = "()"
+
+**输出：**true 
+
+**提示：**
+
+- `1 <= s.length <= 104`
+- `s` 仅由括号 `'()[]{}'` 组成
+
+```c++
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> st;
+        for(int i = 0; i < s.size(); ++i){
+            switch(s[i]){
+                case '(': st.push(')'); continue;
+                case '[': st.push(']'); continue;
+                case '{': st.push('}'); continue;
+                case ')': if(st.empty() || st.top() != ')') return false; st.pop(); continue;
+                case ']': if(st.empty() || st.top() != ']') return false; st.pop(); continue;
+                case '}': if(st.empty() || st.top() != '}') return false; st.pop(); continue;
+            }
+        }
+        if(st.empty()) return true;
+        return false;
+    }
+};
+```
+
+
 
 5 
 
