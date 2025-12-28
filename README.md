@@ -2105,11 +2105,48 @@ public:
 
 # 动态规划
 
-139 
+### [139. 单词拆分](https://leetcode.cn/problems/word-break/)
 
- leetcode 139题，我给的回溯解法
+中等
+
+给你一个字符串 `s` 和一个字符串列表 `wordDict` 作为字典。如果可以利用字典中出现的一个或多个单词拼接出 `s` 则返回 `true`。
+
+**注意：**不要求字典中出现的单词全部都使用，并且字典中的单词可以重复使用。
+
+**示例 1：**
+
+```
+输入: s = "leetcode", wordDict = ["leet", "code"]
+输出: true
+解释: 返回 true 因为 "leetcode" 可以由 "leet" 和 "code" 拼接成。
+```
+
+**示例 2：**
+
+```
+输入: s = "applepenapple", wordDict = ["apple", "pen"]
+输出: true
+解释: 返回 true 因为 "applepenapple" 可以由 "apple" "pen" "apple" 拼接成。
+     注意，你可以重复使用字典中的单词。
+```
+
+**示例 3：**
+
+```
+输入: s = "catsandog", wordDict = ["cats", "dog", "sand", "and", "cat"]
+输出: false
+```
+
+**提示：**
+
+- `1 <= s.length <= 300`
+- `1 <= wordDict.length <= 1000`
+- `1 <= wordDict[i].length <= 20`
+- `s` 和 `wordDict[i]` 仅由小写英文字母组成
+- `wordDict` 中的所有字符串 **互不相同**
+
 ```c++
-class Solution {
+class Solution { //回溯 （用例超时版本）
 public:
     bool wordBreak(string s, vector<string>& wordDict) {
         bool judge = false;
@@ -2142,6 +2179,14 @@ s =
 wordDict =
 ["a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa"]
 超时了，请指出我代码中的问题，并在原有思路的命名习惯的基础上修正代码，在关键地方加上详细注解
+
+主要问题（简要）
+
+1. **result 未初始化大小**：`result[level]` 直接访问会越界
+2. **level-- 用错**：递归参数不应修改当前层的 `level`
+3. **回溯条件错误**：`level < 0` 时应保存结果
+4. **存的是索引 i，而不是 nums[i]**
+5. **used 多开一位无意义**
 
 ```c++
 class Solution {
@@ -2194,7 +2239,51 @@ public:
 };
 ```
 
+```c++
+class Solution {//动态规划 gpt
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        unordered_set<string> dict(wordDict.begin(), wordDict.end());
 
+        int n = s.size();
+        // dp[i]: 前 i 个字符是否可以被拆分
+        vector<bool> dp(n + 1, false);
+
+        dp[0] = true; // 空字符串
+
+        for (int i = 1; i <= n; ++i) {
+            for (int j = 0; j < i; ++j) {
+                if (dp[j] && dict.count(s.substr(j, i - j))) {
+                    dp[i] = true;
+                    break; // 已经能拆分，不用再试
+                }
+            }
+        }
+
+        return dp[n];
+    }
+};
+
+```
+现在再看：它为什么**一定是 DP**
+
+我们对照动态规划的三要素：
+
+| 要素       | 在 139 中的体现                   |
+| ---------- | --------------------------------- |
+| 状态       | `dp[i]`                           |
+| 转移       | `dp[i] ← dp[j] && 子串合法`       |
+| 重叠子问题 | 多个 `i` 会反复依赖相同的 `dp[j]` |
+
+✔ 完整
+ ✔ 标准
+ ✔ 教科书级 DP
+
+一句话帮你“建立 DP 直觉”
+
+**只要问题是：
+「前 i 个能不能 / 行不行 / 合不合法」
+那 90% 都是 DP**
 
 122 
 
