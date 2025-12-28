@@ -1992,7 +1992,108 @@ tips:
 3、终止条件一般在叶子节点，也就是递归出口
 4、
 
-46 
+### [46. 全排列](https://leetcode.cn/problems/permutations/)
+
+中等
+
+给定一个不含重复数字的数组 `nums` ，返回其 *所有可能的全排列* 。你可以 **按任意顺序** 返回答案。
+
+**示例 1：**
+
+```
+输入：nums = [1,2,3]
+输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+```
+
+**示例 2：**
+
+```
+输入：nums = [0,1]
+输出：[[0,1],[1,0]]
+```
+
+**示例 3：**
+
+```
+输入：nums = [1]
+输出：[[1]]
+```
+
+**提示：**
+
+- `1 <= nums.length <= 6`
+- `-10 <= nums[i] <= 10`
+- `nums` 中的所有整数 **互不相同**
+
+```c++
+class Solution { //错误尝试
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<int> used(nums.size()+1, 0);
+        backTracking(nums, nums.size()-1, used);
+        return result;
+    }
+
+    void backTracking(vector<int> &nums, int level, vector<int> &used){
+        if(level < 0){
+            return;
+        }
+
+        // vector<int> cur(nums.size());
+        for(int i = 0; i < nums.size(); ++i){
+            if(used[i] == 0){
+                result[level].push_back(i);
+                used[i] = 1;
+                backTracking(nums, level--, used);
+                used[i] = 0;
+                result[level].pop_back();
+            }
+        }
+    }
+
+    vector<vector<int>> result {};
+};
+```
+
+
+
+
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<int> used(nums.size() + 1, 0); //到达某level时，用于过滤掉已经使用过的nums
+        vector<int> path; //记录排列
+        backTracking(nums, nums.size(), used, path);
+        return result;
+    }
+
+    void backTracking(vector<int>& nums, int level,
+                      vector<int>& used, vector<int>& path) {
+        if (level == 0) { //递归出口
+            result.push_back(path);
+            return;
+        }
+
+        for (int i = 0; i < nums.size(); ++i) {
+            if (used[i] == 0) {
+                path.push_back(nums[i]);   // 用元素值
+                used[i] = 1;
+
+                backTracking(nums, level - 1, used, path);
+
+                used[i] = 0; //回溯used
+                path.pop_back(); //回溯path
+            }
+        }
+    }
+
+    vector<vector<int>> result;
+};
+```
+
+
 
 130 
 
@@ -2005,6 +2106,95 @@ tips:
 # 动态规划
 
 139 
+
+ leetcode 139题，我给的回溯解法
+```c++
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        bool judge = false;
+        unordered_set<string> words;
+        for(auto word: wordDict){
+            words.insert(word);
+        }
+
+        backTracking(s, words, s.size(), judge);
+        return judge;
+    }
+
+    void backTracking(string s, unordered_set<string>& words, int level, bool& judge){
+        if(level == 0){
+            judge = true;
+            return;
+        }
+        for(int i = 0; i < s.size(); ++i){
+            string preStr = s.substr(0, i+1);
+            if(words.find(preStr) != words.end()){
+                backTracking(s.substr(i+1), words, s.size()-i-1, judge);
+            }
+        }
+    }
+};
+```
+但是用例
+s =
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab"
+wordDict =
+["a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa"]
+超时了，请指出我代码中的问题，并在原有思路的命名习惯的基础上修正代码，在关键地方加上详细注解
+
+```c++
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        bool judge = false;
+        unordered_set<string> words;
+        for (auto& word : wordDict) {
+            words.insert(word);
+        }
+
+        unordered_set<string> failStr; // 记忆化：某个 s 是否已经失败
+        backTracking(s, words, judge, failStr);
+        return judge;
+    }
+
+    void backTracking(string s,
+                      unordered_set<string>& words,
+                      bool& judge,
+                      unordered_set<string>& failStr) {
+
+        // 如果已经找到答案，直接剪枝
+        if (judge) return;
+
+        // 空串，说明成功切分
+        if (s.empty()) {
+            judge = true;
+            return;
+        }
+
+        // 如果这个 s 之前已经判断为“不可拆分”，直接返回
+        if (failStr.count(s)) return;
+
+        // 枚举前缀
+        for (int i = 0; i < s.size(); ++i) {
+            string preStr = s.substr(0, i + 1);
+
+            if (words.find(preStr) != words.end()) {
+                string restStr = s.substr(i + 1);
+                backTracking(restStr, words, judge, failStr);
+
+                // 一旦成功，立刻结束
+                if (judge) return;
+            }
+        }
+
+        // 能走到这里，说明 s 无论如何都拆不开
+        failStr.insert(s);
+    }
+};
+```
+
+
 
 122 
 
