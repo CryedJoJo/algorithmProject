@@ -2223,22 +2223,16 @@ public:
         return judge;
     }
 
-    void backTracking(string s,
-                      unordered_set<string>& words,
-                      bool& judge,
-                      unordered_set<string>& failStr) {
+    void backTracking(string s, unordered_set<string>& words,
+                      bool& judge, unordered_set<string>& failStr) {
 
-        // 如果已经找到答案，直接剪枝
-        if (judge) return;
-
+        // 如果已经找到答案，如果这个 s 之前已经判断为“不可拆分”。直接剪枝
+        if (judge || failStr.count(s)) return;
         // 空串，说明成功切分
         if (s.empty()) {
             judge = true;
             return;
         }
-
-        // 如果这个 s 之前已经判断为“不可拆分”，直接返回
-        if (failStr.count(s)) return;
 
         // 枚举前缀
         for (int i = 0; i < s.size(); ++i) {
@@ -2252,7 +2246,6 @@ public:
                 if (judge) return;
             }
         }
-
         // 能走到这里，说明 s 无论如何都拆不开
         failStr.insert(s);
     }
@@ -2294,10 +2287,6 @@ public:
 | 状态       | `dp[i]`                           |
 | 转移       | `dp[i] ← dp[j] && 子串合法`       |
 | 重叠子问题 | 多个 `i` 会反复依赖相同的 `dp[j]` |
-
-✔ 完整
- ✔ 标准
- ✔ 教科书级 DP
 
 一句话帮你“建立 DP 直觉”
 
@@ -2536,7 +2525,161 @@ public:
 
 # ！栈
 
-71 
+### [71. 简化路径](https://leetcode.cn/problems/simplify-path/)
+
+中等
+
+给你一个字符串 `path` ，表示指向某一文件或目录的 Unix 风格 **绝对路径** （以 `'/'` 开头），请你将其转化为 **更加简洁的规范路径**。
+
+在 Unix 风格的文件系统中规则如下：
+
+- 一个点 `'.'` 表示当前目录本身。
+- 此外，两个点 `'..'` 表示将目录切换到上一级（指向父目录）。
+- 任意多个连续的斜杠（即，`'//'` 或 `'///'`）都被视为单个斜杠 `'/'`。
+- 任何其他格式的点（例如，`'...'` 或 `'....'`）均被视为有效的文件/目录名称。
+
+返回的 **简化路径** 必须遵循下述格式：
+
+- 始终以斜杠 `'/'` 开头。
+- 两个目录名之间必须只有一个斜杠 `'/'` 。
+- 最后一个目录名（如果存在）**不能** 以 `'/'` 结尾。
+- 此外，路径仅包含从根目录到目标文件或目录的路径上的目录（即，不含 `'.'` 或 `'..'`）。
+
+返回简化后得到的 **规范路径** 。
+
+**示例 1：**
+
+**输入：**path = "/home/"
+
+**输出：**"/home"
+
+**解释：**
+
+应删除尾随斜杠。
+
+**示例 2：**
+
+**输入：**path = "/home//foo/"
+
+**输出：**"/home/foo"
+
+**解释：**
+
+多个连续的斜杠被单个斜杠替换。
+
+**示例 3：**
+
+**输入：**path = "/home/user/Documents/../Pictures"
+
+**输出：**"/home/user/Pictures"
+
+**解释：**
+
+两个点 `".."` 表示上一级目录（父目录）。
+
+**示例 4：**
+
+**输入：**path = "/../"
+
+**输出：**"/"
+
+**解释：**
+
+不可能从根目录上升一级目录。
+
+**示例 5：**
+
+**输入：**path = "/.../a/../b/c/../d/./"
+
+**输出：**"/.../b/d"
+
+**解释：**
+
+`"..."` 在这个问题中是一个合法的目录名。
+
+**提示：**
+
+- `1 <= path.length <= 3000`
+- `path` 由英文字母，数字，`'.'`，`'/'` 或 `'_'` 组成。
+- `path` 是一个有效的 Unix 风格绝对路径。
+
+```c++
+class Solution {
+public:
+    string simplifyPath(string path) {
+        string cleanPath; //简洁路径
+        vector<string> pathRecord; //记录实际有用的 路径切片
+
+        //①路径清理
+        size_t start = 0; //起始指针
+        size_t pos = 0; // 记录'/'的位置
+        while((pos = path.find('/', start)) != string::npos){
+            string cur = path.substr(start, pos - start);
+            start = pos + 1; //跳过 '/'
+            if(cur == "." || cur == "") { //找到无效路径
+                continue;
+            } else if(cur == "..") { //找到回退路径
+                if(pathRecord.empty()) continue; //前序路径为空 无效回退
+                pathRecord.pop_back(); //前序路径非空 有效回退
+            } else {
+                pathRecord.push_back(cur); //添加路径
+            }
+        }
+
+        if(start != path.size()){ // "/home/mdc" 的情况，start 指向m
+            string cur = path.substr(start, path.size() - start);
+            if(cur == "."){
+            } else if(cur == "..") {
+                if(!pathRecord.empty())
+                    pathRecord.pop_back();
+            } else {
+                pathRecord.push_back(cur);
+            }
+        }
+
+        //②路径还原
+        if(pathRecord.empty()) return "/";
+        for(auto str: pathRecord){ 
+            cleanPath += "/";
+            cleanPath += str;
+        }
+        return cleanPath;
+    }
+};
+```
+
+在不改变你思路的前提下，给你一版「微优化版」
+保持你：find + substr + vector 栈的思路
+
+```c++
+class Solution {//GPT 优化
+public:
+    string simplifyPath(string path) {
+        vector<string> stk;
+        path.push_back('/'); // 关键：统一处理最后一个 token
+
+        size_t start = 0;
+        size_t pos = 0;
+        while ((pos = path.find('/', start)) != string::npos) {
+            string cur = path.substr(start, pos - start);
+            start = pos + 1;
+            if (cur.empty() || cur == ".") continue;
+            if (cur == "..") {
+                if (!stk.empty()) stk.pop_back();
+            } else {
+                stk.push_back(cur);
+            }
+        }
+
+        if (stk.empty()) return "/";
+        string res;
+        for (auto& s : stk) {
+            res += "/" + s;
+        }
+        return res;
+    }
+};
+```
 
 394 
 
