@@ -1992,6 +1992,28 @@ tips:
 3、终止条件一般在叶子节点，也就是递归出口
 4、
 
+
+
+回溯 就是在递归结束返回上一级递归时 的代码位置
+
+![img](./回溯/回溯示意图.png)
+
+```c++
+class tree;
+void preOder(tree& root){
+    if(root == nullptr) return;
+    std::cout << root->data << std::endl;
+    preOder(root->left);
+    preOder(root->right);
+    /*
+    	回溯动作(处理完自身节点后，要回到上一层时，需要“复位”上一层的某些状态。
+    */
+}
+
+```
+
+
+
 ### [46. 全排列](https://leetcode.cn/problems/permutations/)
 
 中等
@@ -2054,8 +2076,6 @@ public:
     vector<vector<int>> result {};
 };
 ```
-
-
 
 
 
