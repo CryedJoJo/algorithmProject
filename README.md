@@ -2,6 +2,67 @@ discription：This project is created to document my journey of practicing LeetC
 
 git status;git add .;git commit -m "update";git push;
 
+```
+5 -
+8
+15
+17
+18
+23
+32
+34
+42
+43
+60
+62
+64
+76
+84
+122
+122
+127
+130
+169
+210
+224
+269
+273
+300
+317
+332
+394
+394
+460
+547
+554
+685
+752
+781
+815
+846
+871
+974
+1074
+1109
+1163
+1190
+1224
+1776
+2050
+523 
+525 
+437
+45 
+452 
+435
+621 
+135
+820 
+648 
+```
+
+
+
 # ！递归
 
 ### [70.爬楼梯](https://leetcode.cn/problems/climbing-stairs/) 
@@ -133,15 +194,15 @@ public:
 };
 ```
 
-### 394 
+394 
 
-### 60 
+60 
 
-### 273
+273
 
 # 分治
 
-### 169 
+169 
 
 ### [240. 搜索二维矩阵 II](https://leetcode.cn/problems/search-a-2d-matrix-ii/)
 
@@ -228,7 +289,7 @@ public:
 
 
 
-### 23
+23
 
 
 
@@ -578,7 +639,7 @@ public:
 
 
 
-### 1776
+1776
 
 # ！并查集
 
@@ -1231,7 +1292,7 @@ public:
 
 你继续选，我陪你把并查集这块彻底吃透。
 
-### 685
+685
 
 # ！滑动窗口（能屈能伸）
 
@@ -1472,7 +1533,7 @@ public:
 
 
 
-### 76
+76
 
 
 
@@ -1656,19 +1717,6 @@ public:
 
 
 # 拓扑排序
-
-
-代码
-
-
-
-测试用例
-
-测试用例
-
-
-
-测试结果
 
 ### [210. 课程表 II](https://leetcode.cn/problems/course-schedule-ii/)
 
@@ -1958,7 +2006,6 @@ public:
 ```
 
 tips:
-
 
 34 
 
@@ -2513,7 +2560,64 @@ public:
 
 # ！双指针
 
-11 
+### [11. 盛最多水的容器](https://leetcode.cn/problems/container-with-most-water/)
+
+中等
+
+给定一个长度为 `n` 的整数数组 `height` 。有 `n` 条垂线，第 `i` 条线的两个端点是 `(i, 0)` 和 `(i, height[i])` 。
+
+找出其中的两条线，使得它们与 `x` 轴共同构成的容器可以容纳最多的水。
+
+返回容器可以储存的最大水量。
+
+**说明：**你不能倾斜容器。
+
+**示例 1：**
+
+![img](https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/25/question_11.jpg)
+
+```
+输入：[1,8,6,2,5,4,8,3,7]
+输出：49 
+解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
+```
+
+**示例 2：**
+
+```
+输入：height = [1,1]
+输出：1
+```
+
+**提示：**
+
+- `n == height.length`
+- `2 <= n <= 105`
+- `0 <= height[i] <= 104`
+
+```c++
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        int area = 0;
+
+        int right = height.size() - 1;
+        int left = 0;
+        while(right != left){
+            int len = right - left; // max len只会出现在第一次进入while循环时，后面之后越来越小
+            int h = min(height[left], height[right]); //两个高度最相近且距远的，就是答案
+            area = max(area, len * h);
+            if(height[left] <= height[right]){ //往中间收拢，越收拢 对高度的要求越高
+                left++;
+            } else {
+                right--;
+            }
+        }
+
+        return area;
+    }
+};
+```
 
 15 
 
