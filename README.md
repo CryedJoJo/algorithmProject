@@ -3,15 +3,15 @@ discription：This project is created to document my journey of practicing LeetC
 git status;git add .;git commit -m "update";git push;
 
 ```
-5 -
-8
-15
-17
-18
+5 -p
+8 -
+15 -
+17 p
+18 -p
 23
-32
-34
-42
+32 - 拍脑门的题
+34 -
+42 p
 43
 60
 62
@@ -2166,7 +2166,79 @@ public:
 
 547 
 
-17 
+### [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)
+
+中等
+
+给定一个仅包含数字 `2-9` 的字符串，返回所有它能表示的字母组合。答案可以按 **任意顺序** 返回。
+
+给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+
+![img](https://pic.leetcode.cn/1752723054-mfIHZs-image.png)
+
+ 
+
+**示例 1：**
+
+```
+输入：digits = "23"
+输出：["ad","ae","af","bd","be","bf","cd","ce","cf"]
+```
+
+**示例 2：**
+
+```
+输入：digits = "2"
+输出：["a","b","c"]
+```
+
+**提示：**
+
+- `1 <= digits.length <= 4`
+- `digits[i]` 是范围 `['2', '9']` 的一个数字。
+
+```c++
+class Solution { //标准回溯代码 自己写的
+public:
+    vector<string> letterCombinations(string digits) {
+        vector<string> ret;
+        vector<string> strBox;
+        for(auto c: digits){
+            strBox.push_back(numToStr[c]);
+        }
+
+        string str;
+        backTracking(strBox, ret, str, 0);
+        return ret;
+    }
+
+    void backTracking(vector<string>& strBox, vector<string>& ret, string& str, int level){
+        if(level == strBox.size()){
+            ret.push_back(str);
+            return;
+        }
+
+        for(auto c:strBox[level]){
+            str += c;
+            backTracking(strBox, ret, str, level+1);
+            str.pop_back();
+        }
+    }
+
+    unordered_map<char,string> numToStr = {
+        {'2', "abc"},
+        {'3', "def"},
+        {'4', "ghi"},
+        {'5', "jkl"},
+        {'6', "mno"},
+        {'7', "pqrs"},
+        {'8', "tuv"},
+        {'9', "wxyz"}
+    };
+};
+```
+
+
 
 332 
 
@@ -2621,7 +2693,101 @@ public:
 
 15 
 
-42 
+### [42. 接雨水](https://leetcode.cn/problems/trapping-rain-water/)
+
+困难
+
+给定 `n` 个非负整数表示每个宽度为 `1` 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+
+ 
+
+**示例 1：**
+
+![img](https://assets.leetcode.cn/aliyun-lc-upload/uploads/2018/10/22/rainwatertrap.png)
+
+```
+输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]
+输出：6
+解释：上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。 
+```
+
+**示例 2：**
+
+```
+输入：height = [4,2,0,3,2,5]
+输出：9
+```
+
+ **提示：**
+
+- `n == height.length`
+- `1 <= n <= 2 * 104`
+- `0 <= height[i] <= 105`
+
+```c++
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        stack<int> st;
+        int ret = 0;
+        int leftMax = 0;
+        int maxPos = 0;
+        for(int i = 0; i < height.size(); ++i){
+            while(!st.empty() && height[i] >= leftMax){ //出现等高或更高位，开始接雨水
+                int h = height[st.top()];
+                st.pop();
+                ret += leftMax-h; //高度差就是能接雨水的量
+            }
+            if(height[i] >= leftMax){
+                leftMax = height[i];
+                maxPos = i;
+            }
+            if(height[i] < leftMax) //只有比最高位低，才可能接住雨水
+                st.push(i); //将有可能接住雨水的位置压栈
+        }
+        if(!st.empty()){ //最高的pos在中间，掩盖了其后的低位弹栈
+            stack<int> st2;
+            int rightMax = 0;
+            for(int i = height.size() - 1; i >= maxPos; --i){
+                while(!st2.empty() && height[i] >= rightMax){
+                    int h1 = height[st2.top()];
+                    st2.pop();
+                    ret += rightMax-h1;
+                }
+                rightMax = max(rightMax, height[i]);
+                if(height[i] < rightMax)
+                    st2.push(i);
+            }
+        }
+        return ret;
+    }
+};
+```
+
+```c++
+class Solution { //力扣官方题解 (双指针)
+public:
+    int trap(vector<int>& height) {
+        int ans = 0;
+        int left = 0, right = height.size() - 1;
+        int leftMax = 0, rightMax = 0;
+        while (left < right) {
+            leftMax = max(leftMax, height[left]);
+            rightMax = max(rightMax, height[right]);
+            if (height[left] < height[right]) {
+                ans += leftMax - height[left];
+                ++left;
+            } else {
+                ans += rightMax - height[right];
+                --right;
+            }
+        }
+        return ans;
+    }
+};
+```
+
+
 
 18 
 
