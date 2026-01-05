@@ -726,6 +726,8 @@ public:
 };
 ```
 
+并查集解法：每次将 [i+1] [j] 和 [i] [j+1] 元素加入岛屿集合
+
 ![img](./并查集/200岛屿数量.png)
 
 ```c++
@@ -776,9 +778,7 @@ public:
         }
         uf.setCount(islandCount);
 
-        int arr[2][2] = { {1, 0}, 
-                          {0, 1}};
-
+        int arr[2][2] = { {1, 0}, {0, 1}};
         for(int r = 0; r < row; ++r){
             for(int c = 0; c < clos; ++c){
                 if(grid[r][c] == '1'){
@@ -2162,7 +2162,82 @@ public:
 
 
 
-130 
+### [130. 被围绕的区域](https://leetcode.cn/problems/surrounded-regions/)
+
+中等
+
+给你一个 `m x n` 的矩阵 `board` ，由若干字符 `'X'` 和 `'O'` 组成，**捕获** 所有 **被围绕的区域**：
+
+- **连接：**一个单元格与水平或垂直方向上相邻的单元格连接。
+- **区域：连接所有** `'O'` 的单元格来形成一个区域。
+- **围绕：**如果您可以用 `'X'` 单元格 **连接这个区域**，并且区域中没有任何单元格位于 `board` 边缘，则该区域被 `'X'` 单元格围绕。
+
+通过 **原地** 将输入矩阵中的所有 `'O'` 替换为 `'X'` 来 **捕获被围绕的区域**。你不需要返回任何值。
+
+ 
+
+**示例 1：**
+
+**输入：**board = [['X','X','X','X'],['X','O','O','X'],['X','X','O','X'],['X','O','X','X']]
+
+**输出：**[['X','X','X','X'],['X','X','X','X'],['X','X','X','X'],['X','O','X','X']]
+
+**解释：**
+
+![img](https://pic.leetcode.cn/1718167191-XNjUTG-image.png)
+
+在上图中，底部的区域没有被捕获，因为它在 board 的边缘并且不能被围绕。
+
+**示例 2：**
+
+**输入：**board = [['X']]
+
+**输出：**[['X']]
+
+**提示：**
+
+- `m == board.length`
+- `n == board[i].length`
+- `1 <= m, n <= 200`
+- `board[i][j]` 为 `'X'` 或 `'O'`
+
+```c++
+class Solution { //独立 （沉没孤岛 问题 
+public:
+    void solve(vector<vector<char>>& board) {
+        int m = board.size() - 1;
+        int n = board[0].size() - 1;
+        for(int i = 0; i <= m; ++i){
+            for(int j = 0; j <= n; ++j){
+                if(board[i][j] == 'O' 
+                    && (i == 0 || j == 0 || i == m || j == n)){
+                    DFS(board, i, j);
+                }
+            }
+        }
+        for(int i = 0; i <= m; ++i){
+            for(int j = 0; j <= n; ++j){
+                if(board[i][j] == 'O'){
+                    board[i][j] = 'X';
+                } else if(board[i][j] == 'Z'){
+                    board[i][j] = 'O';
+                }
+            }
+        }
+    }
+
+    vector<vector<int>> pos = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+    void DFS(vector<vector<char>>& board, int i, int j){
+        if(i < 0 || j < 0 || i >= board.size()
+            || j >= board[0].size()) return;
+        if(board[i][j] != 'O') return;
+        board[i][j] = 'Z';
+        for(auto p:pos) DFS(board, i+p[0], j+p[1]);
+    }
+};
+```
+
+
 
 547 
 
