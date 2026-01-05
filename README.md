@@ -2202,7 +2202,7 @@ public:
 - `board[i][j]` 为 `'X'` 或 `'O'`
 
 ```c++
-class Solution { //独立 （沉没孤岛 问题 
+class Solution { //独立 （沉没孤岛 问题 ）
 public:
     void solve(vector<vector<char>>& board) {
         int m = board.size() - 1;
