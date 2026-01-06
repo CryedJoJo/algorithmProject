@@ -12,7 +12,7 @@ git status;git add .;git commit -m "update";git push;
 32 - 拍脑门的题
 34 -
 42 p
-43
+43 -p
 60
 62
 64
@@ -35,7 +35,7 @@ git status;git add .;git commit -m "update";git push;
 460
 547
 554
-685
+685 -p
 752
 781
 815
@@ -196,7 +196,91 @@ public:
 
 394 
 
-60 
+### [60. 排列序列](https://leetcode.cn/problems/permutation-sequence/)
+
+困难
+
+给出集合 `[1,2,3,...,n]`，其所有元素共有 `n!` 种排列。
+
+按大小顺序列出所有排列情况，并一一标记，当 `n = 3` 时, 所有排列如下：
+
+1. `"123"`
+2. `"132"`
+3. `"213"`
+4. `"231"`
+5. `"312"`
+6. `"321"`
+
+给定 `n` 和 `k`，返回第 `k` 个排列。
+
+**示例 1：**
+
+```
+输入：n = 3, k = 3
+输出："213"
+```
+
+**示例 2：**
+
+```
+输入：n = 4, k = 9
+输出："2314"
+```
+
+**示例 3：**
+
+```
+输入：n = 3, k = 1
+输出："123"
+```
+
+**提示：**
+
+- `1 <= n <= 9`
+- `1 <= k <= n!`
+
+```c++
+class Solution { //独立
+public:
+    int childrenNum = 0;
+    string ret;
+    vector<int> used;
+    int deep;
+    string getPermutation(int n, int k) {
+        string num;
+        deep = n;
+        used.resize(n+1); //为了方便 这儿给到了n+1， 不然for循环访问 n时就越界了
+        backTracking(k, num, 1);
+        return ret;
+    }
+
+    void backTracking(int k, string num, int pre){
+        if(num.size() == deep){
+            childrenNum++;
+            if(k == childrenNum){
+                ret = num;
+            }
+            // std::cout << num << " ";
+            return;
+        }
+
+        // std::cout << "\n";
+        for(int i = 1; i <= deep; ++i){
+            if(used[i] == 1) continue; //搞半天 是没有用used数组，半天没写出来
+            used[i] = 1;
+            num += (i + '0');
+            // std::cout << num << " ";
+            backTracking(k, num, pre+1);
+            num.pop_back();
+            used[i] = 0;
+        }
+    }
+};
+```
+
+## ！！！回溯一定考虑下 要不要用used 数组防止重复访问
+
+
 
 273
 
@@ -1292,7 +1376,139 @@ public:
 
 你继续选，我陪你把并查集这块彻底吃透。
 
-685
+### [685. 冗余连接 II](https://leetcode.cn/problems/redundant-connection-ii/)
+
+困难
+
+在本问题中，有根树指满足以下条件的 **有向** 图。该树只有一个根节点，所有其他节点都是该根节点的后继。该树除了根节点之外的每一个节点都有且只有一个父节点，而根节点没有父节点。
+
+输入一个有向图，该图由一个有着 `n` 个节点（节点值不重复，从 `1` 到 `n`）的树及一条附加的有向边构成。附加的边包含在 `1` 到 `n` 中的两个不同顶点间，这条附加的边不属于树中已存在的边。
+
+结果图是一个以边组成的二维数组 `edges` 。 每个元素是一对 `[ui, vi]`，用以表示 **有向** 图中连接顶点 `ui` 和顶点 `vi` 的边，其中 `ui` 是 `vi` 的一个父节点。
+
+返回一条能删除的边，使得剩下的图是有 `n` 个节点的有根树。若有多个答案，返回最后出现在给定二维数组的答案。 
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2020/12/20/graph1.jpg)
+
+```
+输入：edges = [[1,2],[1,3],[2,3]]
+输出：[2,3]
+```
+
+**示例 2：**
+
+![img](https://assets.leetcode.com/uploads/2020/12/20/graph2.jpg)
+
+```
+输入：edges = [[1,2],[2,3],[3,4],[4,1],[1,5]]
+输出：[4,1]
+```
+
+**提示：**
+
+- `n == edges.length`
+- `3 <= n <= 1000`
+- `edges[i].length == 2`
+- `1 <= ui, vi <= n`
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    vector<int> findRedundantDirectedConnection(vector<vector<int>>& edges) {
+        vector<int> inDegree(edges.size()+1);
+        vector<int> node;
+        int doubleDegreeNode;
+        vector<int> ret;
+
+        for(int i = 0; i < edges.size(); ++i){
+            int from = edges[i][0];
+            int to = edges[i][1];
+            inDegree[to]++;
+            if(inDegree[to] == 2){
+                doubleDegreeNode = to;
+            }
+        }
+
+        for(int i = 0; i < edges.size(); ++i){
+            int from = edges[i][0];
+            int to = edges[i][1];
+            if(to == doubleDegreeNode){
+                node.push_back(from);
+            }
+        }
+
+        if(node.size() == 2){
+            if(isTreeAfterDelNode(node[1], doubleDegreeNode, edges)){
+                return {node[1], doubleDegreeNode}; //node[1] 先验证，因为node[1]最后出现的点
+            } else {
+                return {node[0], doubleDegreeNode};
+            }
+        }
+
+        return getTreeNode(edges);
+    }
+
+    vector<int> parent;
+
+    void init(int n){
+        parent.resize(n+1);
+        for(int i = 0; i <= n; ++i){
+            parent[i] = i;
+        }
+    }
+
+    int find(int a){
+        if(parent[a] != a){
+            parent[a] = find(parent[a]);
+        }
+        return parent[a];
+    }
+
+    void unionTow(int a, int b){
+        int pa = find(a);
+        int pb = find(b);
+        if(pa == pb) return;
+        parent[pb] = pa;
+    }
+
+    bool InSame(int a, int b){
+        return find(a) == find(b);
+    }
+
+    bool isTreeAfterDelNode(int node, int doubleDegreeNode, vector<vector<int>>& edges){
+        init(edges.size());
+        for(int i = 0; i < edges.size(); ++i){
+            int from = edges[i][0];
+            int to = edges[i][1];
+            if(from == node && to == doubleDegreeNode) continue; //忽略此边，看是否能成树
+            
+            if(InSame(from, to)) return false;
+
+            unionTow(from, to);
+        }
+        return true; //忽略了这条边能成树，说明就是 node -> doubleDegreeNode 这条边搞的鬼
+    }
+
+    vector<int> getTreeNode(vector<vector<int>>& edges){
+        init(edges.size());
+        for(int i = 0; i < edges.size(); ++i){
+            int from = edges[i][0];
+            int to = edges[i][1];
+            if(InSame(from, to)) return {from, to};
+            unionTow(from, to);
+        }
+        return {}; //不会走到这儿
+    }
+};
+```
+
+
 
 # ！滑动窗口（能屈能伸）
 
@@ -2007,7 +2223,68 @@ public:
 
 tips:
 
-34 
+[43. 字符串相乘](https://leetcode.cn/problems/multiply-strings/)
+
+中等
+
+给定两个以字符串形式表示的非负整数 `num1` 和 `num2`，返回 `num1` 和 `num2` 的乘积，它们的乘积也表示为字符串形式。
+
+**注意：**不能使用任何内置的 BigInteger 库或直接将输入转换为整数。
+
+ 
+
+**示例 1:**
+
+```
+输入: num1 = "2", num2 = "3"
+输出: "6"
+```
+
+**示例 2:**
+
+```
+输入: num1 = "123", num2 = "456"
+输出: "56088"
+```
+
+**提示：**
+
+- `1 <= num1.length, num2.length <= 200`
+- `num1` 和 `num2` 只能由数字组成。
+- `num1` 和 `num2` 都不包含任何前导零，除了数字0本身。
+
+```c++
+class Solution { //小鲁班
+public:
+    string multiply(string num1, string num2) {
+        if (num1 == "0" || num2 == "0") return "0";
+
+        int m = num1.size(), n = num2.size();
+        vector<int> result(m + n, 0); // 最多 m+n 位
+
+        // 模拟竖式乘法
+        for (int i = m - 1; i >= 0; i--) {
+            for (int j = n - 1; j >= 0; j--) {
+                int mul = (num1[i] - '0') * (num2[j] - '0');
+                int sum = mul + result[i + j + 1]; // 加上已有的值
+                result[i + j + 1] = sum % 10;
+                result[i + j] += sum / 10; // 进位
+            }
+        }
+
+        // 转为字符串，跳过前导零
+        string ans = "";
+        for (int i = 0; i < result.size(); i++) {
+            if (ans.empty() && result[i] == 0) continue; // 跳过前导零
+            ans += (result[i] + '0');
+        }
+
+        return ans.empty() ? "0" : ans;
+    }
+};
+```
+
+
 
 300 
 
@@ -2017,7 +2294,99 @@ tips:
 
 752 
 
-210 
+### [210. 课程表 II](https://leetcode.cn/problems/course-schedule-ii/)
+
+中等
+
+现在你总共有 `numCourses` 门课需要选，记为 `0` 到 `numCourses - 1`。给你一个数组 `prerequisites` ，其中 `prerequisites[i] = [ai, bi]` ，表示在选修课程 `ai` 前 **必须** 先选修 `bi` 。
+
+- 例如，想要学习课程 `0` ，你需要先完成课程 `1` ，我们用一个匹配来表示：`[0,1]` 。
+
+返回你为了学完所有课程所安排的学习顺序。可能会有多个正确的顺序，你只要返回 **任意一种** 就可以了。如果不可能完成所有课程，返回 **一个空数组** 。
+
+**示例 1：**
+
+```
+输入：numCourses = 2, prerequisites = [[1,0]]
+输出：[0,1]
+解释：总共有 2 门课程。要学习课程 1，你需要先完成课程 0。因此，正确的课程顺序为 [0,1] 。
+```
+
+**示例 2：**
+
+```
+输入：numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]
+输出：[0,2,1,3]
+解释：总共有 4 门课程。要学习课程 3，你应该先完成课程 1 和课程 2。并且课程 1 和课程 2 都应该排在课程 0 之后。
+因此，一个正确的课程顺序是 [0,1,2,3] 。另一个正确的排序是 [0,2,1,3] 。
+```
+
+**示例 3：**
+
+```
+输入：numCourses = 1, prerequisites = []
+输出：[0]
+```
+
+**提示：**
+
+- `1 <= numCourses <= 2000`
+- `0 <= prerequisites.length <= numCourses * (numCourses - 1)`
+- `prerequisites[i].length == 2`
+- `0 <= ai, bi < numCourses`
+- `ai != bi`
+- 所有`[ai, bi]` **互不相同**
+
+```c++
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        unordered_map<int, unordered_set<int>> table; // course -> prerequisites
+        unordered_map<int, vector<int>> cln;          // course -> next courses
+
+        // 建图
+        for (auto& edge : prerequisites) {
+            table[edge[0]].insert(edge[1]);
+            cln[edge[1]].push_back(edge[0]);
+        }
+
+        vector<int> seq;
+        queue<int> q;
+
+        // 找所有“当前没有前置依赖”的课程
+        for (int i = 0; i < numCourses; ++i) {
+            if (table.find(i) == table.end()) {
+                q.push(i);
+            }
+        }
+
+        while (!q.empty()) {
+            int cur = q.front();
+            q.pop();
+            seq.push_back(cur);
+
+            // cur 作为前置课程，影响后续课程
+            if (cln.count(cur)) {
+                for (int next : cln[cur]) {
+                    table[next].erase(cur);
+                    if (table[next].empty()) {
+                        table.erase(next);
+                        q.push(next);
+                    }
+                }
+            }
+        }
+
+        // 如果还有课程没被加入，说明有环
+        if (seq.size() != numCourses)
+            return {};
+
+        return seq;
+    }
+};
+```
+
+
 
 127 
 
@@ -2037,9 +2406,6 @@ tips:
 1、回溯法都适用n叉树模型
 2、回溯的递归函数一遍没有返回值类型
 3、终止条件一般在叶子节点，也就是递归出口
-4、
-
-
 
 回溯 就是在递归结束返回上一级递归时 的代码位置
 
@@ -2488,7 +2854,65 @@ public:
 「前 i 个能不能 / 行不行 / 合不合法」
 那 90% 都是 DP**
 
-122 
+###　[122. 买卖股票的最佳时机 II](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-ii/)
+
+中等
+
+给你一个整数数组 `prices` ，其中 `prices[i]` 表示某支股票第 `i` 天的价格。
+
+在每一天，你可以决定是否购买和/或出售股票。你在任何时候 **最多** 只能持有 **一股** 股票。然而，你可以在 **同一天** 多次买卖该股票，但要确保你持有的股票不超过一股。
+
+返回 *你能获得的 **最大** 利润* 。
+
+**示例 1：**
+
+```
+输入：prices = [7,1,5,3,6,4]
+输出：7
+解释：在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5 - 1 = 4。
+随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6 - 3 = 3。
+最大总利润为 4 + 3 = 7 。
+```
+
+**示例 2：**
+
+```
+输入：prices = [1,2,3,4,5]
+输出：4
+解释：在第 1 天（股票价格 = 1）的时候买入，在第 5 天 （股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5 - 1 = 4。
+最大总利润为 4 。
+```
+
+**示例 3：**
+
+```
+输入：prices = [7,6,4,3,1]
+输出：0
+解释：在这种情况下, 交易无法获得正利润，所以不参与交易可以获得最大利润，最大利润为 0。
+```
+
+**提示：**
+
+- `1 <= prices.length <= 3 * 104`
+- `0 <= prices[i] <= 104`
+
+```c++
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        vector<vector<int>> dp(prices.size(), vector<int>(2));
+        dp[0][0] = -prices[0];
+        dp[0][1] = 0;
+        for(int i = 1; i < prices.size(); ++i){
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1]-prices[i]); //当前持有后 剩余资金
+            dp[i][1] = max(dp[i-1][1], prices[i]+dp[i][0]); //当前不持有 收益的最大值
+        }
+        return dp[prices.size()-1][1];
+    }
+};
+```
+
+
 
 62 
 
@@ -2800,7 +3224,7 @@ public:
 - `0 <= height[i] <= 105`
 
 ```c++
-class Solution {
+class Solution {　//不定式
 public:
     int trap(vector<int>& height) {
         stack<int> st;
