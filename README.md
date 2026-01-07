@@ -2140,13 +2140,390 @@ public:
 
 
 
-5 
 
-43
+代码
 
-8 
+代码
 
-32 
+
+
+通过
+
+
+
+
+
+测试用例
+
+测试用例
+
+
+
+测试结果
+
+### [5. 最长回文子串](https://leetcode.cn/problems/longest-palindromic-substring/)
+
+中等
+
+给你一个字符串 `s`，找到 `s` 中最长的 回文 子串。 
+
+**示例 1：**
+
+```
+输入：s = "babad"
+输出："bab"
+解释："aba" 同样是符合题意的答案。
+```
+
+**示例 2：**
+
+```
+输入：s = "cbbd"
+输出："bb"
+```
+
+**提示：**
+
+- `1 <= s.length <= 1000`
+- `s` 仅由数字和英文字母组成
+
+```c++
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        if(s.empty()) return "";
+        if(s.size() == 1) return s;
+
+        // vector<vector<int>> dpn(s.size(), vector<int>(s.size()));
+        vector<vector<pair<int, int>>> dpos(s.size(), vector<pair<int, int>>(s.size()));
+        for(int i = 0; i < s.size(); ++i){
+            dpos[i][i] = {i, 1};
+        }
+        // for(int i = 0; i < s.size(); ++i){
+        //     dpn[i][i] = 1;
+        // }
+
+        for(int i = s.size()-1; i >= 0; --i){
+            for(int j = i+1; j < s.size(); ++j){
+                if(s[i] == s[j] && dpos[i+1][j-1].second == s.substr(i, j-i-1).size()){
+                    // dpn[i][j] = dpn[i+1][j-1]+2;
+                    dpos[i][j] = {i, dpos[i+1][j-1].second + 2};
+                } else {
+                    if(dpos[i+1][j].second >= dpos[i][j-1].second){
+                        // dpn[i][j] = dpn[i+1][j];
+                        dpos[i][j] = dpos[i+1][j];
+                    } else {
+                        // dpn[i][j] = dpn[i][j-1];
+                        dpos[i][j] = dpos[i][j-1];
+                    }
+                }
+            }
+        }
+        int from = dpos[0][s.size()-1].first;
+        int to = dpos[0][s.size()-1].second;
+        return s.substr(from, to);
+    }
+};
+```
+
+```c++
+class Solution { //中心扩展 双指针
+public:
+    string longestPalindrome(string s) {
+        vector<int> pos(2);
+        pos[0] = 0;  // 起始位置
+        pos[1] = 1;  // 当前最长回文长度
+
+        for (int i = 0; i < s.size(); ++i) {
+            // 情况1：奇数长度回文（以 i 为中心）
+            int left = i - 1;
+            int right = i + 1;
+            while (left >= 0 && right < s.size() && s[left] == s[right]) {
+                if (right - left + 1 > pos[1]) {
+                    pos[0] = left;
+                    pos[1] = right - left + 1;
+                }
+                left--;
+                right++;
+            }
+
+            // 情况2：偶数长度回文（以 i 和 i+1 为中心）
+            if (i + 1 < s.size() && s[i] == s[i + 1]) {
+                // ✅ 先手动更新 pos：当前回文是 s[i] 和 s[i+1]，长度为 2
+                if (2 > pos[1]) {
+                    pos[0] = i;
+                    pos[1] = 2;
+                }
+
+                // ✅ 然后才开始扩展：left = i-1, right = i+2
+                left = i - 1;
+                right = i + 2;
+                while (left >= 0 && right < s.size() && s[left] == s[right]) {
+                    if (right - left + 1 > pos[1]) {
+                        pos[0] = left;
+                        pos[1] = right - left + 1;
+                    }
+                    left--;
+                    right++;
+                }
+            }
+        }
+
+        return s.substr(pos[0], pos[1]);
+    }
+};
+```
+
+
+
+### [43. 字符串相乘](https://leetcode.cn/problems/multiply-strings/)
+
+已解答
+
+中等
+
+给定两个以字符串形式表示的非负整数 `num1` 和 `num2`，返回 `num1` 和 `num2` 的乘积，它们的乘积也表示为字符串形式。
+
+**注意：**不能使用任何内置的 BigInteger 库或直接将输入转换为整数。
+
+**示例 1:**
+
+```
+输入: num1 = "2", num2 = "3"
+输出: "6"
+```
+
+**示例 2:**
+
+```
+输入: num1 = "123", num2 = "456"
+输出: "56088"
+```
+
+**提示：**
+
+- `1 <= num1.length, num2.length <= 200`
+- `num1` 和 `num2` 只能由数字组成。
+- `num1` 和 `num2` 都不包含任何前导零，除了数字0本身。
+
+```c++
+class Solution { //小鲁班
+public:
+    string multiply(string num1, string num2) {
+        if (num1 == "0" || num2 == "0") return "0";
+
+        int m = num1.size(), n = num2.size();
+        vector<int> result(m + n, 0); // 最多 m+n 位
+
+        // 模拟竖式乘法
+        for (int i = m - 1; i >= 0; i--) {
+            for (int j = n - 1; j >= 0; j--) {
+                int mul = (num1[i] - '0') * (num2[j] - '0');
+                int sum = mul + result[i + j + 1]; // 加上已有的值
+                result[i + j + 1] = sum % 10;
+                result[i + j] += sum / 10; // 进位
+            }
+        }
+
+        // 转为字符串，跳过前导零
+        string ans = "";
+        for (int i = 0; i < result.size(); i++) {
+            if (ans.empty() && result[i] == 0) continue; // 跳过前导零
+            ans += (result[i] + '0');
+        }
+
+        return ans.empty() ? "0" : ans;
+    }
+};
+```
+
+
+
+### [8. 字符串转换整数 (atoi)](https://leetcode.cn/problems/string-to-integer-atoi/)
+
+中等
+
+请你来实现一个 `myAtoi(string s)` 函数，使其能将字符串转换成一个 32 位有符号整数。
+
+函数 `myAtoi(string s)` 的算法如下：
+
+1. **空格：**读入字符串并丢弃无用的前导空格（`" "`）
+2. **符号：**检查下一个字符（假设还未到字符末尾）为 `'-'` 还是 `'+'`。如果两者都不存在，则假定结果为正。
+3. **转换：**通过跳过前置零来读取该整数，直到遇到非数字字符或到达字符串的结尾。如果没有读取数字，则结果为0。
+4. **舍入：**如果整数数超过 32 位有符号整数范围 `[−231, 231 − 1]` ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 `−231` 的整数应该被舍入为 `−231` ，大于 `231 − 1` 的整数应该被舍入为 `231 − 1` 。
+
+返回整数作为最终结果。
+
+ 
+
+**示例 1：**
+
+**输入：**s = "42"
+
+**输出：**42
+
+**解释：**加粗的字符串为已经读入的字符，插入符号是当前读取的字符。
+
+```
+带下划线线的字符是所读的内容，插入符号是当前读入位置。
+第 1 步："42"（当前没有读入字符，因为没有前导空格）
+         ^
+第 2 步："42"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
+         ^
+第 3 步："42"（读入 "42"）
+           ^
+```
+
+**示例 2：**
+
+**输入：**s = " -042"
+
+**输出：**-42
+
+**解释：**
+
+```
+第 1 步："   -042"（读入前导空格，但忽视掉）
+            ^
+第 2 步："   -042"（读入 '-' 字符，所以结果应该是负数）
+             ^
+第 3 步："   -042"（读入 "042"，在结果中忽略前导零）
+               ^
+```
+
+**示例 3：**
+
+**输入：**s = "1337c0d3"
+
+**输出：**1337
+
+**解释：**
+
+```
+第 1 步："1337c0d3"（当前没有读入字符，因为没有前导空格）
+         ^
+第 2 步："1337c0d3"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
+         ^
+第 3 步："1337c0d3"（读入 "1337"；由于下一个字符不是一个数字，所以读入停止）
+             ^
+```
+
+**示例 4：**
+
+**输入：**s = "0-1"
+
+**输出：**0
+
+**解释：**
+
+```
+第 1 步："0-1" (当前没有读入字符，因为没有前导空格)
+         ^
+第 2 步："0-1" (当前没有读入字符，因为这里不存在 '-' 或者 '+')
+         ^
+第 3 步："0-1" (读入 "0"；由于下一个字符不是一个数字，所以读入停止)
+          ^
+```
+
+**示例 5：**
+
+**输入：**s = "words and 987"
+
+**输出：**0
+
+**解释：**
+
+读取在第一个非数字字符“w”处停止。
+
+**提示：**
+
+- `0 <= s.length <= 200`
+- `s` 由英文字母（大写和小写）、数字（`0-9`）、`' '`、`'+'`、`'-'` 和 `'.'` 组成
+
+```c++
+class Solution {
+public:
+    int myAtoi(string s) {
+        //去除空格
+        int i = 0;
+        while(s[i] == ' '){
+            i++;
+        }
+        if(i < s.size())
+            s = s.substr(i, s.size() - i + 1); //这个 s.size()-i+1 可能越界
+        else
+            return 0;
+        int negtive = 1;
+        i = 0;
+        if((s[i] == '-' || s[i] == '+') && i < s.size()){
+            if(s[i] == '-')
+                negtive = -1;
+            i++;
+        }
+        long long num = 0;
+        for(; i < s.size(); ++i){
+            if(isdigit(s[i])){
+                num = num*10 + (s[i] - '0');
+                {
+                    if (num * negtive > INT_MAX) return INT_MAX;
+                    if (num * negtive < INT_MIN) return INT_MIN;
+                }
+                continue; 
+            } else {
+                break;
+            }
+        }
+        if (num * negtive > INT_MAX) return INT_MAX;
+        if (num * negtive < INT_MIN) return INT_MIN;
+
+        return num*negtive;
+    }
+};
+```
+
+
+
+### [32. 最长有效括号](https://leetcode.cn/problems/longest-valid-parentheses/)
+
+困难
+
+相关标签
+
+给你一个只包含 `'('` 和 `')'` 的字符串，找出最长有效（格式正确且连续）括号 子串 的长度。
+
+左右括号匹配，即每个左括号都有对应的右括号将其闭合的字符串是格式正确的，比如 `"(()())"`。
+
+ 
+
+**示例 1：**
+
+```
+输入：s = "(()"
+输出：2
+解释：最长有效括号子串是 "()"
+```
+
+**示例 2：**
+
+```
+输入：s = ")()())"
+输出：4
+解释：最长有效括号子串是 "()()"
+```
+
+**示例 3：**
+
+```
+输入：s = ""
+输出：0
+```
+
+ 
+
+**提示：**
+
+- `0 <= s.length <= 3 * 104`
+- `s[i]` 为 `'('` 或 `')'`
 
 
 
