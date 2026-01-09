@@ -13,10 +13,10 @@ git status;git add .;git commit -m "update";git push;
 34 -
 42 p
 43 -p
-60
-62
-64
-76
+60 p
+62 p 
+64 p
+76 p
 84
 122
 122
@@ -1749,7 +1749,155 @@ public:
 
 
 
-76
+### [76. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
+
+困难
+
+提示
+
+给定两个字符串 `s` 和 `t`，长度分别是 `m` 和 `n`，返回 s 中的 **最短窗口 子串**，使得该子串包含 `t` 中的每一个字符（**包括重复字符**）。如果没有这样的子串，返回空字符串 `""`。
+
+测试用例保证答案唯一。
+
+**示例 1：**
+
+```
+输入：s = "ADOBECODEBANC", t = "ABC"
+输出："BANC"
+解释：最小覆盖子串 "BANC" 包含来自字符串 t 的 'A'、'B' 和 'C'。
+```
+
+**示例 2：**
+
+```
+输入：s = "a", t = "a"
+输出："a"
+解释：整个字符串 s 是最小覆盖子串。
+```
+
+**示例 3:**
+
+```
+输入: s = "a", t = "aa"
+输出: ""
+解释: t 中两个字符 'a' 均应包含在 s 的子串中，
+因此没有符合条件的子字符串，返回空字符串。
+```
+
+**提示：**
+
+- `m == s.length`
+- `n == t.length`
+- `1 <= m, n <= 105`
+- `s` 和 `t` 由英文字母组成
+
+```c++
+class Solution { // 这个版本 s == aa , t == aa 这种过不了
+public:
+
+    string minWindow(string s, string t) {
+        if(s.size() < t.size()) return "";
+        unordered_map<char,int> charPos;
+        unordered_map<char,int> charPosRefer;
+        for(int i = 0; i < t.size(); ++i){
+            charPos[t[i]] = 0;
+            charPosRefer[t[i]]++;
+        }
+
+        int len = t.size();
+        int j = 0;
+        int count = 0;
+        string ret = s;
+        bool flag = false;
+        for(int i = 0; i < s.size(); ++i){
+
+            if(charPos.find(s[i]) != charPos.end()){
+                charPos[s[i]]++;
+                if(charPos[s[i]] == charPosRefer[s[i]]){
+                    count++;
+                }
+            }
+            
+            while(count == len && j <= i){
+                flag = true;
+                string cur = s.substr(j, i-j+1);
+                if(cur.size() < ret.size()){
+                    ret = cur;
+                }
+                char pre = s[j++];
+                if(charPos.find(pre) != charPos.end()){
+                    if(charPos[pre] == charPosRefer[pre]){
+                        count--;
+                    }
+                    charPos[pre]--;
+                }
+            }
+        }
+        if(flag)
+            return ret;
+        return "";
+    }
+};
+```
+
+
+
+```c++
+class Solution { //独立
+public:
+    string minWindow(string s, string t) {
+        if(s.size() < t.size()) return "";
+        map<char,pair<int, int>> charFrequency;
+        for(int i = 0; i < t.size(); ++i){
+            // 统计curStr中 s[i] == t[i]个数 
+            charFrequency[t[i]].first = 0; 
+            charFrequency[t[i]].second++; // 记录t[i]出现的次数
+        }
+
+        int diffCharCount = charFrequency.size(); //不同字母个数
+        int left = 0; //窗口左边界
+        int count = 0; //字符串种类数
+        string ret = s; // 结果
+        bool flag = false; // 是否存在有效子串
+        for(int right = 0; right < s.size(); ++right){
+            if(charFrequency.find(s[right]) != charFrequency.end()){
+                charFrequency[s[right]].first++;
+                if(charFrequency[s[right]].first == charFrequency[s[right]].second){
+                    count++;
+                }
+            }
+            int preleft = left;
+            while(count == diffCharCount && left <= right){
+                flag = true;
+                preleft = left;
+                char preChar = s[left++];
+                // there ---
+                // string curStr = s.substr(preleft, right-preleft+1);
+                if(charFrequency.find(preChar) != charFrequency.end()){
+                    if(charFrequency[preChar].first == charFrequency[preChar].second){
+                        count--;
+                        //当count--的时候才用需要使用preleft计算curStr
+                        //不然把substr放while的第一层 there ---
+                        //每次循环都跑一次，极端场景 aaaaa……aaaBCD  
+                        //找aBCD这种直接爆内存
+                        string curStr = s.substr(preleft, right-preleft+1);
+                        if(curStr.size() < ret.size()){
+                            ret = curStr;
+                        }
+                    }
+                    charFrequency[preChar].first--;
+                }
+            }
+
+        }
+        if(flag)
+            return ret;
+        return "";
+    }
+};
+```
+
+
 
 
 
@@ -3291,9 +3439,146 @@ public:
 
 
 
-62 
+### [62. 不同路径](https://leetcode.cn/problems/unique-paths/)
 
-64 
+中等
+
+一个机器人位于一个 `m x n` 网格的左上角 （起始点在下图中标记为 “Start” ）。
+
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。
+
+问总共有多少条不同的路径？
+
+**示例 1：**
+
+![img](https://pic.leetcode.cn/1697422740-adxmsI-image.png)
+
+```
+输入：m = 3, n = 7
+输出：28
+```
+
+**示例 2：**
+
+```
+输入：m = 3, n = 2
+输出：3
+解释：
+从左上角开始，总共有 3 条路径可以到达右下角。
+1. 向右 -> 向下 -> 向下
+2. 向下 -> 向下 -> 向右
+3. 向下 -> 向右 -> 向下
+```
+
+**示例 3：**
+
+```
+输入：m = 7, n = 3
+输出：28
+```
+
+**示例 4：**
+
+```
+输入：m = 3, n = 3
+输出：6
+```
+
+**提示：**
+
+- `1 <= m, n <= 100`
+- 题目数据保证答案小于等于 `2 * 109`
+
+```c++
+class Solution { //独立 2026年1月10日 03:30:30
+public:
+    int uniquePaths(int m, int n) {
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+
+        for(int i = 0; i < m; ++i){
+            dp[i][0] = 1;
+        }
+        for(int j = 1; j < n; ++j){
+            dp[0][j] = 1;
+        }
+        int maxRoute = 0;
+        for(int i = 1; i < m; ++i){
+            for(int j = 1; j < n; ++j){
+                dp[i][j] = dp[i-1][j] + dp[i][j-1];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+};
+```
+
+
+
+### [64. 最小路径和](https://leetcode.cn/problems/minimum-path-sum/)
+
+中等
+
+给定一个包含非负整数的 `*m* x *n*` 网格 `grid` ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
+
+**说明：**每次只能向下或者向右移动一步。
+
+ 
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2020/11/05/minpath.jpg)
+
+```
+输入：grid = [[1,3,1],[1,5,1],[4,2,1]]
+输出：7
+解释：因为路径 1→3→1→1→1 的总和最小。
+```
+
+**示例 2：**
+
+```
+输入：grid = [[1,2,3],[4,5,6]]
+输出：12
+```
+
+**提示：**
+
+- `m == grid.length`
+- `n == grid[i].length`
+- `1 <= m, n <= 200`
+- `0 <= grid[i][j] <= 200`
+
+```c++
+class Solution { //独立 2026年1月10日 03:29:59
+public:
+    int m = 0;
+    int n = 0;
+    int minPathSum(vector<vector<int>>& grid) {
+        m = grid.size();
+        n = grid[0].size();
+
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+        dp[0][0] = grid[0][0];
+        for(int i = 1; i < m; ++i){
+            dp[i][0] =  dp[i-1][0] + grid[i][0];
+        }
+        for(int j = 1; j < n; ++j){
+            dp[0][j] = dp[0][j-1] + grid[0][j];
+        }
+        if(m == 1 || n == 1){
+            return dp[m-1][n-1];
+        }
+        for(int i = 1; i < m; ++i){
+            for(int j = 1; j < n; ++j){
+                dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+};
+```
+
+
 
 871 
 
