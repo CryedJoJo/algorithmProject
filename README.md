@@ -1847,7 +1847,7 @@ class Solution { //独立
 public:
     string minWindow(string s, string t) {
         if(s.size() < t.size()) return "";
-        map<char,pair<int, int>> charFrequency;
+        map<char,pair<int, int>> charFrequency; // map耗时51ms, unordered_map 43ms
         for(int i = 0; i < t.size(); ++i){
             // 统计curStr中 s[i] == t[i]个数 
             charFrequency[t[i]].first = 0; 
