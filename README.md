@@ -4805,77 +4805,79 @@ public:
 ```
 
 ```c++
-class Solution { //leetcode
-public:
-    int minRefuelStops(int target, int startFuel, vector<vector<int>>& stations) {
-
-        /*
-         * dp[i] 的含义：
-         * 在“恰好加油 i 次”的前提下，当前最多能行驶到的最远距离
-         *
-         * dp 数组长度 = 加油站数量 + 1
-         * 因为最多只可能在每个加油站加一次油
-         */
-        vector<long> dp(stations.size() + 1);
-
-        /*
-         * 初始状态：
-         * 不加油（i = 0），最多能走的距离就是 startFuel
-         */
-        dp[0] = startFuel;
-
-        /*
-         * 遍历每一个加油站
-         * i 表示当前处理的是第 i 个加油站
-         */
-        for (int i = 0; i < stations.size(); ++i) {
+    class Solution { //leetcode
+    public:
+        int minRefuelStops(int target, int startFuel, vector<vector<int>>& stations) {
 
             /*
-             * 倒序遍历 dp
-             *
-             * j 表示“已经加油 j 次”
-             * 倒序的原因：
-             *  - 避免同一个加油站在同一轮被使用多次
-             *  - 这是 0/1 背包问题的经典写法
-             */
-            for (int j = i; j >= 0; --j) {
+            * dp[i] 的含义：
+            * 在“恰好加油 i 次”的前提下，当前最多能行驶到的最远距离
+            *
+            * dp 数组长度 = 加油站数量 + 1
+            * 因为最多只可能在每个加油站加一次油
+            */
+            vector<long> dp(stations.size() + 1);
+
+            /*
+            * 初始状态：
+            * 不加油（i = 0），最多能走的距离就是 startFuel
+            */
+            dp[0] = startFuel;
+
+            /*
+            * 遍历每一个加油站
+            * i 表示当前处理的是第 i 个加油站
+            */
+            for (int i = 0; i < stations.size(); ++i) {
 
                 /*
-                 * 如果在加油 j 次的情况下
-                 * 能够到达当前加油站的位置 stations[i][0]
-                 */
-                if (dp[j] >= stations[i][0]) {
+                * 倒序遍历 dp
+                *
+                * j 表示“已经加油 j 次”
+                * 倒序的原因：
+                *  - 避免同一个加油站在同一轮被使用多次
+                *  - 这是 0/1 背包问题的经典写法
+                */
+                for (int j = i; j >= 0; --j) {
 
                     /*
-                     * 那么可以选择在当前加油站加油一次
-                     *
-                     * 加油后：
-                     *  - 加油次数变为 j + 1
-                     *  - 最远可达距离 = dp[j] + 当前加油站提供的油 stations[i][1]
-                     *
-                     * 取最大值，保留最优解
-                     */
-                    dp[j + 1] = max(dp[j + 1], dp[j] + stations[i][1]);
+                    * 如果在加油 j 次的情况下
+                    * 能够到达当前加油站的位置 stations[i][0]
+                    */
+                    if (dp[j] >= stations[i][0]) {
+
+                        /*
+                        * 那么可以选择在当前加油站加油一次
+                        *
+                        * 加油后：
+                        *  - 加油次数变为 j + 1
+                        *  - 最远可达距离 = dp[j] + 当前加油站提供的油 stations[i][1]
+                        *
+                        * 取最大值，保留最优解
+                        */
+                        //如果是最和依次 j = i max开始，当j==0，走进来就意味着，dp[1] = max(old dp[1], dp[0] + station[imax][1]),就是说，车可以直接开到最后的加油站
+                        dp[j + 1] = max(dp[j + 1], dp[j] + stations[i][1]);
+                    }
                 }
             }
-        }
 
-        /*
-         * 最后从小到大遍历 dp
-         * 找到第一个能够到达 target 的最小加油次数
-         */
-        for (int i = 0; i <= stations.size(); ++i) {
-            if (dp[i] >= target) {
-                return i;
+            /*
+            * 最后从小到大遍历 dp
+            * 找到第一个能够到达 target 的最小加油次数
+            */
+            for (int i = 0; i <= stations.size(); ++i) {
+                if (dp[i] >= target) {
+                    return i;
+                }
             }
-        }
 
-        /*
-         * 所有情况都无法到达 target
-         */
-        return -1;
-    }
-};
+            /*
+            * 所有情况都无法到达 target
+            */
+            return -1;
+        }
+    };
+
 ```
 
 
