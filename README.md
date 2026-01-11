@@ -1,4 +1,4 @@
-​	discription：This project is created to document my journey of practicing LeetCode algorithm questions while preparing for the huawei od position.
+	discription：This project is created to document my journey of practicing LeetCode algorithm questions while preparing for the huawei od position.
 
 git status;git add .;git commit -m "update";git push;
 
@@ -37,10 +37,10 @@ git status;git add .;git commit -m "update";git push;
 554 -p
 685 -p
 752 -p 
-781 
-815
-846
-871
+781 p
+815 (这个出题的没学过中文)
+846 -p
+871 
 974
 - 1074 
 1109
@@ -4759,7 +4759,126 @@ public:
 };
 ```
 
-871 
+### [871. 最低加油次数](https://leetcode.cn/problems/minimum-number-of-refueling-stops/)
+
+困难
+
+汽车从起点出发驶向目的地，该目的地位于出发位置东面 `target` 英里处。
+
+沿途有加油站，用数组 `stations` 表示。其中 `stations[i] = [positioni, fueli]` 表示第 `i` 个加油站位于出发位置东面 `positioni` 英里处，并且有 `fueli` 升汽油。
+
+假设汽车油箱的容量是无限的，其中最初有 `startFuel` 升燃料。它每行驶 1 英里就会用掉 1 升汽油。当汽车到达加油站时，它可能停下来加油，将所有汽油从加油站转移到汽车中。
+
+为了到达目的地，汽车所必要的最低加油次数是多少？如果无法到达目的地，则返回 `-1` 。
+
+注意：如果汽车到达加油站时剩余燃料为 `0`，它仍然可以在那里加油。如果汽车到达目的地时剩余燃料为 `0`，仍然认为它已经到达目的地。
+
+ 
+
+**示例 1：**
+
+```
+输入：target = 1, startFuel = 1, stations = []
+输出：0
+解释：可以在不加油的情况下到达目的地。
+```
+
+**示例 2：**
+
+```
+输入：target = 100, startFuel = 1, stations = [[10,100]]
+输出：-1
+解释：无法抵达目的地，甚至无法到达第一个加油站。
+```
+
+**示例 3：**
+
+```
+输入：target = 100, startFuel = 10, stations = [[10,60],[20,30],[30,30],[60,40]]
+输出：2
+解释：
+出发时有 10 升燃料。
+开车来到距起点 10 英里处的加油站，消耗 10 升燃料。将汽油从 0 升加到 60 升。
+然后，从 10 英里处的加油站开到 60 英里处的加油站（消耗 50 升燃料），
+并将汽油从 10 升加到 50 升。然后开车抵达目的地。
+沿途在两个加油站停靠，所以返回 2 。
+```
+
+```c++
+class Solution { //leetcode
+public:
+    int minRefuelStops(int target, int startFuel, vector<vector<int>>& stations) {
+
+        /*
+         * dp[i] 的含义：
+         * 在“恰好加油 i 次”的前提下，当前最多能行驶到的最远距离
+         *
+         * dp 数组长度 = 加油站数量 + 1
+         * 因为最多只可能在每个加油站加一次油
+         */
+        vector<long> dp(stations.size() + 1);
+
+        /*
+         * 初始状态：
+         * 不加油（i = 0），最多能走的距离就是 startFuel
+         */
+        dp[0] = startFuel;
+
+        /*
+         * 遍历每一个加油站
+         * i 表示当前处理的是第 i 个加油站
+         */
+        for (int i = 0; i < stations.size(); ++i) {
+
+            /*
+             * 倒序遍历 dp
+             *
+             * j 表示“已经加油 j 次”
+             * 倒序的原因：
+             *  - 避免同一个加油站在同一轮被使用多次
+             *  - 这是 0/1 背包问题的经典写法
+             */
+            for (int j = i; j >= 0; --j) {
+
+                /*
+                 * 如果在加油 j 次的情况下
+                 * 能够到达当前加油站的位置 stations[i][0]
+                 */
+                if (dp[j] >= stations[i][0]) {
+
+                    /*
+                     * 那么可以选择在当前加油站加油一次
+                     *
+                     * 加油后：
+                     *  - 加油次数变为 j + 1
+                     *  - 最远可达距离 = dp[j] + 当前加油站提供的油 stations[i][1]
+                     *
+                     * 取最大值，保留最优解
+                     */
+                    dp[j + 1] = max(dp[j + 1], dp[j] + stations[i][1]);
+                }
+            }
+        }
+
+        /*
+         * 最后从小到大遍历 dp
+         * 找到第一个能够到达 target 的最小加油次数
+         */
+        for (int i = 0; i <= stations.size(); ++i) {
+            if (dp[i] >= target) {
+                return i;
+            }
+        }
+
+        /*
+         * 所有情况都无法到达 target
+         */
+        return -1;
+    }
+};
+```
+
+
 
 # 贪心
 
@@ -5016,11 +5135,128 @@ public:
 };
 ```
 
+### [781. 森林中的兔子](https://leetcode.cn/problems/rabbits-in-forest/)
+
+中等
+
+森林中有未知数量的兔子。提问其中若干只兔子 **"还有多少只兔子与你（指被提问的兔子）颜色相同?"** ，将答案收集到一个整数数组 `answers` 中，其中 `answers[i]` 是第 `i` 只兔子的回答。
+
+给你数组 `answers` ，返回森林中兔子的最少数量。
+
+**示例 1：**
+
+```
+输入：answers = [1,1,2]
+输出：5
+解释：
+两只回答了 "1" 的兔子可能有相同的颜色，设为红色。 
+之后回答了 "2" 的兔子不会是红色，否则他们的回答会相互矛盾。
+设回答了 "2" 的兔子为蓝色。 
+此外，森林中还应有另外 2 只蓝色兔子的回答没有包含在数组中。 
+因此森林中兔子的最少数量是 5 只：3 只回答的和 2 只没有回答的。
+```
+
+**示例 2：**
+
+```
+输入：answers = [10,10,10]
+输出：11
+```
+
+**提示：**
+
+- `1 <= answers.length <= 1000`
+- `0 <= answers[i] < 1000`
+
+```c++
+class Solution { //独立
+public:
+    int numRabbits(vector<int>& answers) {
+        unordered_map<int, int> answerCountMap;
+        for(auto answer: answers){
+            answerCountMap[answer]++;
+        }
+        int numR = 0; //兔子最小数量
+        for(auto elem : answerCountMap){
+            int answerCount = elem.second;
+            int answer = elem.first;
+            if(answerCount <= (answer + 1)){
+                numR += (answer + 1);
+            } else {
+                int Remain = answerCount - (answer + 1);
+                numR += (answer + 1);
+                while(Remain > (answer + 1)){
+                    Remain = Remain - (answer + 1);
+                    numR += (answer + 1);
+                }
+                numR += (answer + 1);
+            }
+        }
+        return numR;
+    }
+};
+```
 
 
-781 
 
-846 
+### [846. 一手顺子](https://leetcode.cn/problems/hand-of-straights/)
+
+中等
+
+Alice 手中有一把牌，她想要重新排列这些牌，分成若干组，使每一组的牌数都是 `groupSize` ，并且由 `groupSize` 张连续的牌组成。
+
+给你一个整数数组 `hand` 其中 `hand[i]` 是写在第 `i` 张牌上的**数值**。如果她可能重新排列这些牌，返回 `true` ；否则，返回 `false` 。
+
+**示例 1：**
+
+```
+输入：hand = [1,2,3,6,2,3,4,7,8], groupSize = 3
+输出：true
+解释：Alice 手中的牌可以被重新排列为 [1,2,3]，[2,3,4]，[6,7,8]。
+```
+
+**示例 2：**
+
+```
+输入：hand = [1,2,3,4,5], groupSize = 4
+输出：false
+解释：Alice 手中的牌无法被重新排列成几个大小为 4 的组。
+```
+
+**提示：**
+
+- `1 <= hand.length <= 104`
+- `0 <= hand[i] <= 109`
+- `1 <= groupSize <= hand.length`
+
+```c++
+class Solution { // 独立 0.5
+public:
+    bool isNStraightHand(vector<int>& hand, int groupSize) {
+        int count = hand.size();
+        if(count%groupSize != 0) return false;
+        unordered_map<int, int> numberCountMap;
+        sort(hand.begin(), hand.end()); //排序
+        for(auto number: hand){
+            numberCountMap[number]++; //计数
+        }
+
+        for(auto startNum: hand){ //每次减去 groupSize个数
+            if(!numberCountMap.count(startNum)) continue;
+            for(int i = 0; i < groupSize; ++i){
+                // ---- 下面是抄的，知道思路逻辑，但是不怎么实现 ------
+                int curNum = startNum + i;
+                if(!numberCountMap.count(curNum)) return false;
+                numberCountMap[curNum]--;
+                if(numberCountMap[curNum] == 0) numberCountMap.erase(curNum);
+            }
+        }
+        return true;
+    }
+};
+```
+
+
 
 460 
 
