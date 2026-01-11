@@ -2,13 +2,15 @@ discription：This project is created to document my journey of practicing LeetC
 
 git status;git add .;git commit -m "update";git push;
 
+
+
 ```
 5 -p
 8 -
 15 -
 17 p
 18 -p
-23
+23 -hard
 32 - 拍脑门的题
 34 -
 42 p
@@ -17,24 +19,22 @@ git status;git add .;git commit -m "update";git push;
 62 p 
 64 p
 76 p
-84
-122
-122
-127
-130
-169
-210
-224
-269
-273
-300
-317
-332
-394
-394
-460
-547
-554
+84 p
+122 -p
+127 -p hard
+130 -p
+169  p  easy
+210 p
+224 - hard
+269 (会员题) hard 
+273 (整数转英文 无意义)  hard
+300 -p
+317  (会员题) hard
+332   hard
+394    
+460   hard
+547 -p
+554 
 685 -p
 752
 781
@@ -42,13 +42,13 @@ git status;git add .;git commit -m "update";git push;
 846
 871
 974
-1074
+1074 hard
 1109
-1163
+1163 hard
 1190
-1224
-1776
-2050
+1224 hard
+1776 hard
+2050 hard
 523 
 525 
 437
@@ -61,7 +61,434 @@ git status;git add .;git commit -m "update";git push;
 648 
 ```
 
+下面这份内容**完全站在「LeetCode 大部分题目实际会用到什么接口」这个角度**来整理，
+**不依赖你刷过什么题、不按 STL 文档分类**，而是：
 
+**刷题中你真的会写、会看到、会被面试官默认“你应该会”的接口**
+
+并且做到你要求的三点：
+
+✅ **string / char / 字符判断接口补全（isdigit、'0' 转 int 等）**
+✅ **算法接口补全（max / min / minmax / clamp 等）**
+✅ **每个接口都有【极简可直接用的示例 + 注释】**
+✅ **覆盖 LeetCode 90%+ 题目**
+# 一、字符 & 字符串（LeetCode 超高频 ）
+1️⃣ char 基础判断（`<cctype>`，刷字符串题必会）
+
+```cpp
+#include <cctype>
+```
+isdigit
+
+```cpp
+char c = '7';
+if (isdigit(c)) {
+    // 判断是否是数字字符 '0' ~ '9'
+}
+```
+isalpha
+```cpp
+if (isalpha('a')) {
+    // 是否是字母
+}
+```
+ isalnum
+```cpp
+if (isalnum('a')) {
+    // 是否是字母或数字
+}
+```
+
+ islower / isupper
+
+```cpp
+islower('a'); // 是否小写
+isupper('A'); // 是否大写
+```
+
+ tolower / toupper
+
+```cpp
+char c = tolower('A'); // 'a'
+// 大小写转换
+```
+
+------
+
+ 2️⃣ char ↔ int（刷题必写 ❗❗）
+
+ 字符转数字（最常见）
+
+```cpp
+char c = '7';
+int num = c - '0';   // 7
+```
+
+ 数字转字符
+
+```cpp
+int x = 5;
+char c = x + '0';    // '5'
+```
+
+ 连续数字字符串 → 整数（手写版）
+
+```cpp
+int num = 0;
+for (char c : s) {
+    if (isdigit(c))
+        num = num * 10 + (c - '0');
+}
+// 解析多位整数（高频）
+```
+
+------
+
+ 3️⃣ string 常用接口（字符串题核心）
+
+```cpp
+string s = "leetcode";
+```
+
+ size / length
+
+```cpp
+int n = s.size();   // 字符串长度
+```
+
+ empty
+
+```cpp
+if (s.empty()) {}
+```
+
+ substr
+
+```cpp
+string sub = s.substr(1, 3);
+// 从下标 1 开始，长度 3
+```
+
+ find
+
+```cpp
+int pos = s.find("code");
+// 查找子串位置，找不到返回 string::npos
+```
+
+ erase
+
+```cpp
+s.erase(2, 2);
+// 从下标 2 删除 2 个字符
+```
+
+ insert
+
+```cpp
+s.insert(3, "abc");
+// 在下标 3 插入字符串
+```
+
+ replace
+
+```cpp
+s.replace(0, 4, "leet");
+// 替换区间
+```
+
+ compare
+
+```cpp
+if (s.compare("abc") == 0) {}
+// 字符串比较
+```
+
+ stoi / stoll
+
+```cpp
+int x = stoi("123");
+long long y = stoll("123456789");
+// 字符串转数字
+```
+
+ to_string
+
+```cpp
+string t = to_string(123);
+// 数字转字符串
+```
+
+------
+
+# 二、算法接口（`<algorithm>`，刷题核心中的核心）
+
+```cpp
+#include <algorithm>
+#include <vector>
+using namespace std;
+
+vector<int> v = {1, 3, 5, 7};
+```
+
+------
+
+ 4️⃣ max / min（你点名要的）
+
+ max
+
+```cpp
+int a = 3, b = 5;
+int m = max(a, b);
+// 返回较大值
+```
+
+ min
+
+```cpp
+int m = min(a, b);
+// 返回较小值
+```
+
+ minmax
+
+```cpp
+auto [mn, mx] = minmax(a, b);
+// 同时得到最小和最大
+```
+
+ clamp（边界限制）
+
+```cpp
+int x = clamp(15, 0, 10);
+// x = 10
+```
+
+------
+
+ 5️⃣ max_element / min_element
+
+```cpp
+int mx = *max_element(v.begin(), v.end());
+// 区间最大元素
+
+int mn = *min_element(v.begin(), v.end());
+// 区间最小元素
+```
+
+------
+
+ 6️⃣ sort / nth_element（排序 & TopK）
+
+ sort
+
+```cpp
+sort(v.begin(), v.end());
+// 排序
+```
+
+ sort + lambda
+
+```cpp
+sort(v.begin(), v.end(), [](int a, int b) {
+    return a > b;
+});
+// 自定义排序
+```
+
+ nth_element（第 K 大 / 小）
+
+```cpp
+nth_element(v.begin(), v.begin() + k, v.end());
+// v[k] 是第 k 小元素（常见 TopK）
+```
+
+------
+
+ 7️⃣ 二分相关（刷题极高频）
+
+ binary_search
+
+```cpp
+bool exist = binary_search(v.begin(), v.end(), 3);
+```
+
+ lower_bound
+
+```cpp
+auto it = lower_bound(v.begin(), v.end(), 4);
+// 第一个 >= 4 的位置
+```
+
+ upper_bound
+
+```cpp
+auto it = upper_bound(v.begin(), v.end(), 4);
+// 第一个 > 4 的位置
+```
+
+------
+
+ 8️⃣ 查找 / 统计
+
+ find
+
+```cpp
+auto it = find(v.begin(), v.end(), 5);
+```
+
+ count
+
+```cpp
+int c = count(v.begin(), v.end(), 3);
+```
+
+ count_if
+
+```cpp
+int c = count_if(v.begin(), v.end(), [](int x){
+    return x > 3;
+});
+```
+
+------
+
+ 9️⃣ 删除 / 去重（双指针常见）
+
+ remove + erase
+
+```cpp
+v.erase(remove(v.begin(), v.end(), 3), v.end());
+// 删除所有值为 3 的元素
+```
+
+ unique
+
+```cpp
+v.erase(unique(v.begin(), v.end()), v.end());
+// 去重（要求先排序）
+```
+
+------
+
+# 三、容器（LeetCode 基础设施）
+
+ 10️⃣ vector
+
+```cpp
+vector<int> v;
+v.push_back(1);
+v.pop_back();
+v.size();
+v.empty();
+v.clear();
+v.resize(10, 0);
+```
+
+------
+
+ 11️⃣ stack（括号 / 单调栈）
+
+```cpp
+stack<int> st;
+st.push(1);
+st.pop();
+int x = st.top();
+```
+
+------
+
+ 12️⃣ queue（BFS）
+
+```cpp
+queue<int> q;
+q.push(1);
+q.pop();
+int x = q.front();
+```
+
+------
+
+ 13️⃣ priority_queue（堆）
+
+```cpp
+priority_queue<int> pq; // 大根堆
+pq.push(3);
+pq.top();
+priority_queue<int, vector<int>, greater<int>> minHeap;
+// 小根堆
+```
+
+------
+
+ 14️⃣ map / unordered_map（哈希题）
+
+```cpp
+unordered_map<int, int> mp;
+mp[1]++;
+mp.find(1);
+mp.count(1);
+mp.erase(1);
+```
+
+------
+
+# 四、数学 & 位运算（LeetCode 高频）
+
+ abs
+
+```cpp
+int x = abs(-5);
+```
+
+ gcd
+
+```cpp
+int g = std::gcd(12, 18);
+```
+
+ __builtin_popcount
+
+```cpp
+int c = __builtin_popcount(7);
+// 二进制 1 的个数
+```
+
+ 位异或
+
+```cpp
+int x = a ^ b;
+// 找只出现一次的数
+```
+
+------
+
+# 五、输入输出加速（面试默认）
+
+```cpp
+ios::sync_with_stdio(false);
+cin.tie(nullptr);
+```
+
+------
+
+ ✅ 总结（重要）
+
+> **如果你把上面这些接口 + 用法全部吃透：**
+
+- 能覆盖 **90% 以上 LeetCode**
+- 中等偏上题不会被“接口不熟”卡住
+- 面试时属于 **“基础扎实，不是刷模板的”**
+
+------
+
+ 📌 如果你愿意继续，我可以直接给你：
+
+1️⃣ **按题型：滑动窗口 / 双指针 / DFS / DP → 接口清单**
+2️⃣ **LeetCode 常见「字符处理模板」合集**
+3️⃣ **C++ 刷题最常用 10 个代码套路（直接背）**
+
+你说一句 **“继续 + 编号”**，我直接给你下一块。
 
 # ！递归
 
@@ -194,7 +621,179 @@ public:
 };
 ```
 
-394 
+### [394. 字符串解码](https://leetcode.cn/problems/decode-string/)
+
+中等
+
+给定一个经过编码的字符串，返回它解码后的字符串。
+
+编码规则为: `k[encoded_string]`，表示其中方括号内部的 `encoded_string` 正好重复 `k` 次。注意 `k` 保证为正整数。
+
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 `k` ，例如不会出现像 `3a` 或 `2[4]` 的输入。
+
+测试用例保证输出的长度不会超过 `105`。
+
+ **示例 1：**
+
+```
+输入：s = "3[a]2[bc]"
+输出："aaabcbc"
+```
+
+**示例 2：**
+
+```
+输入：s = "3[a2[c]]"
+输出："accaccacc"
+```
+
+**示例 3：**
+
+```
+输入：s = "2[abc]3[cd]ef"
+输出："abcabccdcdcdef"
+```
+
+**示例 4：**
+
+```
+输入：s = "abc3[cd]xyz"
+输出："abccdcdcdxyz"
+```
+
+ 
+
+**提示：**
+
+- `1 <= s.length <= 30`
+- `s` 由小写英文字母、数字和方括号 `'[]'` 组成
+- `s` 保证是一个 **有效** 的输入。
+- `s` 中所有整数的取值范围为 `[1, 300]` 
+
+```c++
+class Solution { //只能解 "2[ab]"这种情况，其他都是错的
+public:
+    string decodeString(string s) {
+        string ret;
+        stack<int> st;
+        stack<string> sts;
+        string cur;
+        for(int i = 0; i < s.size(); ++i){
+            if(isdigit(s[i])){
+                st.push(s[i]-'0');
+                cur = "";
+            } else if(s[i] == '[' || s[i] == ']'){
+                if(s[i] == '['){
+                    if(cur.size()){
+                        sts.push(cur);
+                    }
+                    sts.push("[");
+                } else {
+                    if(!st.empty()){
+                        int time = st.top(); st.pop();
+                        string stop = sts.top(); sts.pop();
+                        if(!sts.empty() && sts.top() == "[") sts.pop();
+                        string str;
+                        while(time){
+                            str += cur; time--;
+                        }
+                        if(sts.empty()){
+                           sts.push(str); 
+                        } else {
+                            string newTop = sts.top(); sts.pop();
+                            sts.push(newTop + str);
+                        }
+                    }
+                    cur = "";
+                }
+            } else {
+                cur += s[i];
+            }
+        }
+        return sts.top();
+    }
+};
+```
+
+```c++
+class Solution { //gpt 标准栈
+public:
+    string decodeString(string s) {
+        stack<int> numSt;
+        stack<string> strSt;
+
+        string cur = "";
+        int num = 0;
+
+        for (char c : s) {
+            if (isdigit(c)) {
+                num = num * 10 + (c - '0');   // 处理多位数
+            } 
+            else if (c == '[') {
+                numSt.push(num);
+                strSt.push(cur);
+                num = 0;
+                cur = "";
+            } 
+            else if (c == ']') {
+                int times = numSt.top(); numSt.pop();
+                string prev = strSt.top(); strSt.pop();
+
+                string tmp;
+                while (times--) tmp += cur;
+
+                cur = prev + tmp;
+            } 
+            else {
+                cur += c;
+            }
+        }
+
+        return cur;
+    }
+};
+
+```
+
+```c++
+class Solution { //gpt 标准递归
+public:
+    string decodeString(string s) {
+        int i = 0;
+        return dfs(s, i);
+    }
+
+private:
+    string dfs(const string& s, int& i) {
+        string result = "";
+
+        while (i < s.size()) {
+            if (isdigit(s[i])) {
+                int num = 0;
+                while (i < s.size() && isdigit(s[i])) {
+                    num = num * 10 + (s[i++] - '0');
+                }
+                i++; // skip '['
+                string str = dfs(s, i); // 递归处理内部
+                while (num--) result += str;
+            } 
+            else if (s[i] == ']') {
+                i++; // skip ']'
+                return result;
+            } 
+            else {
+                result += s[i++];
+            }
+        }
+
+        return result;
+    }
+};
+```
+
+
 
 ### [60. 排列序列](https://leetcode.cn/problems/permutation-sequence/)
 
@@ -286,7 +885,80 @@ public:
 
 # 分治
 
-169 
+### [169. 多数元素](https://leetcode.cn/problems/majority-element/)
+
+简单
+
+给定一个大小为 `n` 的数组 `nums` ，返回其中的多数元素。多数元素是指在数组中出现次数 **大于** `⌊ n/2 ⌋` 的元素。
+
+你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+
+**示例 1：**
+
+```
+输入：nums = [3,2,3]
+输出：3
+```
+
+**示例 2：**
+
+```
+输入：nums = [2,2,1,1,1,2,2]
+输出：2
+```
+
+**提示：**
+
+- `n == nums.length`
+- `1 <= n <= 5 * 104`
+- `-109 <= nums[i] <= 109`
+- 输入保证数组中一定有一个多数元素。
+
+**进阶：**尝试设计时间复杂度为 O(n)、空间复杂度为 O(1) 的算法解决此问题。
+
+```c++
+class Solution { //独立
+public:
+    int majorityElement(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        int n = nums.size();
+        return nums[n/2];
+    }
+};
+```
+
+```c++
+class Solution {
+    int count_in_range(vector<int>& nums, int target, int lo, int hi) {
+        int count = 0;
+        for (int i = lo; i <= hi; ++i)
+            if (nums[i] == target)
+                ++count;
+        return count;
+    }
+    int majority_element_rec(vector<int>& nums, int lo, int hi) {
+        if (lo == hi)
+            return nums[lo];
+        int mid = (lo + hi) / 2;
+        int left_majority = majority_element_rec(nums, lo, mid);
+        int right_majority = majority_element_rec(nums, mid + 1, hi);
+        if (count_in_range(nums, left_majority, lo, hi) > (hi - lo + 1) / 2)
+            return left_majority;
+        if (count_in_range(nums, right_majority, lo, hi) > (hi - lo + 1) / 2)
+            return right_majority;
+        return -1;
+    }
+public:
+    int majorityElement(vector<int>& nums) {
+        return majority_element_rec(nums, 0, nums.size() - 1);
+    }
+};
+
+作者：力扣官方题解
+链接：https://leetcode.cn/problems/majority-element/solutions/146074/duo-shu-yuan-su-by-leetcode-solution/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
 
 ### [240. 搜索二维矩阵 II](https://leetcode.cn/problems/search-a-2d-matrix-ii/)
 
@@ -373,7 +1045,131 @@ public:
 
 
 
-23
+### [23. 合并 K 个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists/)
+
+困难
+
+给你一个链表数组，每个链表都已经按升序排列。
+
+请你将所有链表合并到一个升序链表中，返回合并后的链表。
+
+**示例 1：**
+
+```
+输入：lists = [[1,4,5],[1,3,4],[2,6]]
+输出：[1,1,2,3,4,4,5,6]
+解释：链表数组如下：
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+将它们合并到一个有序链表中得到。
+1->1->2->3->4->4->5->6
+```
+
+**示例 2：**
+
+```
+输入：lists = []
+输出：[]
+```
+
+**示例 3：**
+
+```
+输入：lists = [[]]
+输出：[]
+```
+
+**提示：**
+
+- `k == lists.length`
+- `0 <= k <= 10^4`
+- `0 <= lists[i].length <= 500`
+- `-10^4 <= lists[i][j] <= 10^4`
+- `lists[i]` 按 **升序** 排列
+- `lists[i].length` 的总和不超过 `10^4`
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        ListNode* ret = nullptr; //ret 要赋值为nullptr 不然会导致未定义行为
+        for(auto list:lists){
+            ret = mergeTowList(ret, list);
+        }
+        return ret;
+    }
+    ListNode* mergeTowList(ListNode* list1, ListNode* list2){
+        if(!list1 || !list2) return list1 ? list1 : list2;
+        ListNode* p1 = list1;
+        ListNode* p2 = list2;
+        ListNode head, *tail;
+        tail = &head;
+        while(p1 && p2){
+            if(p1->val < p2->val){
+                tail->next = p1;
+                p1 = p1->next;
+            } else {
+                tail->next = p2;
+                p2 = p2->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = p1 ? p1 : p2;
+        return head.next;
+    }
+};
+```
+
+
+
+```c++
+class Solution { //分治
+public:
+    ListNode* mergeTwoLists(ListNode *a, ListNode *b) {
+        if ((!a) || (!b)) return a ? a : b;
+        ListNode head, *tail = &head, *aPtr = a, *bPtr = b;
+        while (aPtr && bPtr) {
+            if (aPtr->val < bPtr->val) {
+                tail->next = aPtr; aPtr = aPtr->next;
+            } else {
+                tail->next = bPtr; bPtr = bPtr->next;
+            }
+            tail = tail->next;
+        }
+        tail->next = (aPtr ? aPtr : bPtr);
+        return head.next;
+    }
+
+    ListNode* merge(vector <ListNode*> &lists, int l, int r) {
+        if (l == r) return lists[l];
+        if (l > r) return nullptr;
+        int mid = (l + r) >> 1;
+        return mergeTwoLists(merge(lists, l, mid), merge(lists, mid + 1, r));
+    }
+
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        return merge(lists, 0, lists.size() - 1);
+    }
+};
+
+作者：力扣官方题解
+链接：https://leetcode.cn/problems/merge-k-sorted-lists/solutions/219756/he-bing-kge-pai-xu-lian-biao-by-leetcode-solutio-2/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
 
 
 
@@ -1897,10 +2693,6 @@ public:
 };
 ```
 
-
-
-
-
 # ！前缀和
 
 ### [560. 和为 K 的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/)
@@ -2809,11 +3601,7 @@ public:
 };
 ```
 
-
-
-300 
-
-
+300
 
 # ！BFS
 
@@ -2911,9 +3699,193 @@ public:
 };
 ```
 
+### [127. 单词接龙](https://leetcode.cn/problems/word-ladder/)
+
+困难
+
+字典 `wordList` 中从单词 `beginWord` 到 `endWord` 的 **转换序列** 是一个按下述规格形成的序列 `beginWord -> s1 -> s2 -> ... -> sk`：
+
+- 每一对相邻的单词只差一个字母。
+-  对于 `1 <= i <= k` 时，每个 `si` 都在 `wordList` 中。注意， `beginWord` 不需要在 `wordList` 中。
+- `sk == endWord`
+
+给你两个单词 `beginWord` 和 `endWord` 和一个字典 `wordList` ，返回 *从 `beginWord` 到 `endWord` 的 **最短转换序列** 中的 **单词数目*** 。如果不存在这样的转换序列，返回 `0` 。
+
+**示例 1：**
+
+```
+输入：beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+输出：5
+解释：一个最短转换序列是 "hit" -> "hot" -> "dot" -> "dog" -> "cog", 返回它的长度 5。
+```
+
+**示例 2：**
+
+```
+输入：beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
+输出：0
+解释：endWord "cog" 不在字典中，所以无法进行转换。
+```
+
+ 
+
+**提示：**
+
+- `1 <= beginWord.length <= 10`
+- `endWord.length == beginWord.length`
+- `1 <= wordList.length <= 5000`
+- `wordList[i].length == beginWord.length`
+- `beginWord`、`endWord` 和 `wordList[i]` 由小写英文字母组成
+- `beginWord != endWord`
+- `wordList` 中的所有字符串 **互不相同**
+
+```c++
+class Solution { //随想录
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        unordered_set<string> strSet;
+        for(auto str: wordList){
+            strSet.insert(str);
+        }
+        unordered_map<string, int> strMap;
+        queue<string> q;
+
+        q.push(beginWord);
+        strMap[beginWord] = 1;
+        while(!q.empty()){
+            string curWord = q.front(); q.pop();
+
+            for(int pos = 0; pos < curWord.size(); ++pos){
+                for(int i = 0; i < 26; ++i ){
+                    string newWord = curWord;//curWord每位常数替换26个字母
+                    newWord[pos] = i + 'a'; 
+                    if(strSet.find(newWord) != strSet.end() && strMap.find(newWord) == strMap.end()){
+                        strMap[newWord] = strMap[curWord] + 1;
+                        if(newWord == endWord){return strMap[newWord];}
+                        q.push(newWord);
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+};
+```
+
+ACM模式：
+
+###### 题目描述
+
+字典 strList 中从字符串 beginStr 和 endStr 的转换序列是一个按下述规格形成的序列： 
+
+1. 序列中第一个字符串是 beginStr。
+2. 序列中最后一个字符串是 endStr。 
+3. 每次转换只能改变一个字符。 
+4. 转换过程中的中间字符串必须是字典 strList 中的字符串，且strList里的每个字符串只用使用一次。 
+
+给你两个字符串 beginStr 和 endStr 和一个字典 strList，找到从 beginStr 到 endStr 的最短转换序列中的字符串数目。如果不存在这样的转换序列，返回 0。
+
+###### 输入描述
+
+第一行包含一个整数 N，表示字典 strList 中的字符串数量。 第二行包含两个字符串，用空格隔开，分别代表 beginStr 和 endStr。 后续 N 行，每行一个字符串，代表 strList 中的字符串。
+
+###### 输出描述
+
+输出一个整数，代表从 beginStr 转换到 endStr 需要的最短转换序列中的字符串数量。如果不存在这样的转换序列，则输出 0。
+
+###### 输入示例
+
+```
+6
+abc def
+efc
+dbc
+ebc
+dec
+dfc
+yhn
+```
+
+###### 输出示例
+
+```
+4
+```
+
+###### 提示信息
+
+从 startStr 到 endStr，在 strList 中最短的路径为 abc -> dbc -> dec -> def，所以输出结果为 4
+
+数据范围：
+
+2 <= N <= 500
+
+ACM 模式
+
+```c++
+#include <unordered_map>
+#include <unordered_set>
+#include <string>
+#include <queue>
+#include <vector>
+#include <iostream>
+
+using namespace std;
+
+unordered_set<string> strSet;
+unordered_map<string, int> strMap;
+queue<string> q;
+vector<string> strV;
+
+void findLen(string first, string last){
+    for(auto str: strV){
+        strSet.insert(str);
+    }
+
+    q.push(first);
+    strMap[first] = 1;
+    string curWord;
+    while(!q.empty()){
+        curWord = q.front(); q.pop();
+        for(int pos = 0; pos < curWord.size(); ++pos){
+
+            for(int i = 0; i < 26; ++i){
+                string newWord = curWord;
+                newWord[pos] = i + 'a';
+
+                if(last == newWord){
+                    std::cout << strMap[curWord] + 1;
+                    return;
+                }
+                if(strSet.find(newWord) != strSet.end() 
+                && strMap.find(newWord) == strMap.end()){
+                    strMap[newWord] = strMap[curWord] + 1;
+                    q.push(newWord);
+                }
+            }
+        }
+    }
+    std::cout << 0;
+}
 
 
-127 
+int main(){
+    int n;
+    cin >> n;
+    string first, last;
+    cin >> first >> last;
+    while(n){
+        string str;
+        cin >> str;
+        strV.push_back(str);
+        n--;
+    }
+    findLen(first, last);
+    return 0;
+}
+```
+
+
 
 317 
 
@@ -3578,7 +4550,65 @@ public:
 };
 ```
 
+### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)
 
+中等
+
+给你一个整数数组 `nums` ，找到其中最长严格递增子序列的长度。
+
+**子序列** 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。例如，`[3,6,2,7]` 是数组 `[0,3,1,6,2,2,7]` 的子序列。
+
+**示例 1：**
+
+```
+输入：nums = [10,9,2,5,3,7,101,18]
+输出：4
+解释：最长递增子序列是 [2,3,7,101]，因此长度为 4 。
+```
+
+**示例 2：**
+
+```
+输入：nums = [0,1,0,3,2,3]
+输出：4
+```
+
+**示例 3：**
+
+```
+输入：nums = [7,7,7,7,7,7,7]
+输出：1
+```
+
+**提示：**
+
+- `1 <= nums.length <= 2500`
+- `-104 <= nums[i] <= 104`
+
+**进阶：**
+
+- 你能将算法的时间复杂度降低到 `O(n log(n))` 吗?
+
+```c++
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        vector<int> dp(nums.size(), 1);
+        dp[0] = 1;
+        int result = 1;
+        for(int i = 1; i < nums.size(); ++i){
+            for(int j = 0; j < i; ++j){ //怎么想得到 要用两层for循环
+                if(nums[i] > nums[j]){
+                    dp[i] = max(dp[j]+1, dp[i]); // 这个好想
+                }
+            }
+            result = max(result, dp[i]);
+        }
+
+        return result;
+    }
+};
+```
 
 871 
 
@@ -4112,11 +5142,301 @@ public:
 };
 ```
 
-394 
+### [394. 字符串解码](https://leetcode.cn/problems/decode-string/)
+
+已解答
+
+中等
+
+给定一个经过编码的字符串，返回它解码后的字符串。
+
+编码规则为: `k[encoded_string]`，表示其中方括号内部的 `encoded_string` 正好重复 `k` 次。注意 `k` 保证为正整数。
+
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 `k` ，例如不会出现像 `3a` 或 `2[4]` 的输入。
+
+测试用例保证输出的长度不会超过 `105`。
+
+ 
+
+**示例 1：**
+
+```
+输入：s = "3[a]2[bc]"
+输出："aaabcbc"
+```
+
+**示例 2：**
+
+```
+输入：s = "3[a2[c]]"
+输出："accaccacc"
+```
+
+**示例 3：**
+
+```
+输入：s = "2[abc]3[cd]ef"
+输出："abcabccdcdcdef"
+```
+
+**示例 4：**
+
+```
+输入：s = "abc3[cd]xyz"
+输出："abccdcdcdxyz"
+```
+
+ 
+
+**提示：**
+
+- `1 <= s.length <= 30`
+- `s` 由小写英文字母、数字和方括号 `'[]'` 组成
+- `s` 保证是一个 **有效** 的输入。
+- `s` 中所有整数的取值范围为 `[1, 300]` 
+
+```c++
+class Solution { //栈解法
+public:
+    string decodeString(string s) {
+        stack<int> numSt;
+        stack<string> strSt;
+
+        string cur = "";
+        int num = 0;
+
+        for (char c : s) {
+            if (isdigit(c)) {
+                num = num * 10 + (c - '0');   // 处理多位数
+            } 
+            else if (c == '[') {
+                numSt.push(num);
+                strSt.push(cur);
+                num = 0;
+                cur = "";
+            } 
+            else if (c == ']') {
+                int times = numSt.top(); numSt.pop();
+                string prev = strSt.top(); strSt.pop();
+
+                string tmp;
+                while (times--) tmp += cur;
+
+                cur = prev + tmp;
+            } 
+            else {
+                cur += c;
+            }
+        }
+
+        return cur;
+    }
+};
+```
+
+
+
+```c++
+class Solution {
+public:
+    string decodeString(string s) {
+        int i = 0;
+        return dfs(s, i);
+    }
+
+private:
+    string dfs(const string& s, int& i) {
+        string result = "";
+
+        while (i < s.size()) {
+            if (isdigit(s[i])) {
+                int num = 0;
+                while (i < s.size() && isdigit(s[i])) {
+                    num = num * 10 + (s[i++] - '0');
+                }
+                i++; // skip '['
+                string str = dfs(s, i); // 递归处理内部
+                while (num--) result += str;
+            } 
+            else if (s[i] == ']') {
+                i++; // skip ']'
+                return result;
+            } 
+            else {
+                result += s[i++];
+            }
+        }
+
+        return result;
+    }
+};
+```
+
+
 
 1190 
 
 84 
 
-224
+### [224. 基本计算器](https://leetcode.cn/problems/basic-calculator/)
 
+困难
+
+给你一个字符串表达式 `s` ，请你实现一个基本计算器来计算并返回它的值。
+
+注意:不允许使用任何将字符串作为数学表达式计算的内置函数，比如 `eval()` 。
+
+**示例 1：**
+
+```
+输入：s = "1 + 1"
+输出：2
+```
+
+**示例 2：**
+
+```
+输入：s = " 2-1 + 2 "
+输出：3
+```
+
+**示例 3：**
+
+```
+输入：s = "(1+(4+5+2)-3)+(6+8)"
+输出：23
+```
+
+**提示：**
+
+- `1 <= s.length <= 3 * 105`
+- `s` 由数字、`'+'`、`'-'`、`'('`、`')'`、和 `' '` 组成
+- `s` 表示一个有效的表达式
+- `'+'` 不能用作一元运算(例如， `"+1"` 和 `"+(2 + 3)"` 无效)
+- `'-'` 可以用作一元运算(即 `"-1"` 和 `"-(2 + 3)"` 是有效的)
+- 输入中不存在两个连续的操作符
+- 每个数字和运行的计算将适合于一个有符号的 32位 整数
+
+```c++
+class Solution { // 1 - (-2) 这种不支持
+public:
+    string exp;
+
+    int calculate(string s) {
+        exp.clear();
+        reverseS(s);
+
+        stack<int> result;
+
+        for(int i = 0; i < exp.size(); ){
+            if(isdigit(exp[i])){
+                int num = 0;
+                while(i < exp.size() && isdigit(exp[i])){
+                    num = num * 10 + (exp[i] - '0');
+                    i++;
+                }
+                result.push(num);
+            }
+            else if(exp[i] == '+' || exp[i] == '-'){
+                int second = result.top(); result.pop();
+                int first  = result.top(); result.pop();
+                result.push(exp[i] == '+' ? first + second : first - second);
+                i++;
+            }
+            else {
+                i++;
+            }
+        }
+        return result.top();
+    }
+
+    void reverseS(string s){
+        stack<char> smbol;
+        for(int i = 0; i < s.size(); ){
+            if(isdigit(s[i])){
+                while(i < s.size() && isdigit(s[i])){
+                    exp += s[i++];
+                }
+                exp += ' ';
+            }
+            else if(s[i] == '('){
+                smbol.push(s[i++]);
+            }
+            else if(s[i] == ')'){
+                while(!smbol.empty() && smbol.top() != '('){
+                    exp += smbol.top();
+                    exp += ' ';
+                    smbol.pop();
+                }
+                smbol.pop();
+                i++;
+            }
+            else if(s[i] == '+' || s[i] == '-'){
+                while(!smbol.empty() && smbol.top() != '('){
+                    exp += smbol.top();
+                    exp += ' ';
+                    smbol.pop();
+                }
+                smbol.push(s[i++]);
+            }
+            else {
+                i++;
+            }
+        }
+
+        while(!smbol.empty()){
+            exp += smbol.top();
+            exp += ' ';
+            smbol.pop();
+        }
+    }
+};
+```
+
+```c++
+//官方答案
+class Solution {
+public:
+    int calculate(string s) {
+        stack<int> ops;
+        ops.push(1);
+        int sign = 1;
+
+        int ret = 0;
+        int n = s.length();
+        int i = 0;
+        while (i < n) {
+            if (s[i] == ' ') {
+                i++;
+            } else if (s[i] == '+') {
+                sign = ops.top();
+                i++;
+            } else if (s[i] == '-') {
+                sign = -ops.top();
+                i++;
+            } else if (s[i] == '(') {
+                ops.push(sign);
+                i++;
+            } else if (s[i] == ')') {
+                ops.pop();
+                i++;
+            } else {
+                long num = 0;
+                while (i < n && s[i] >= '0' && s[i] <= '9') {
+                    num = num * 10 + s[i] - '0';
+                    i++;
+                }
+                ret += sign * num;
+            }
+        }
+        return ret;
+    }
+};
+
+作者：力扣官方题解
+链接：https://leetcode.cn/problems/basic-calculator/solutions/646369/ji-ben-ji-suan-qi-by-leetcode-solution-jvir/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
