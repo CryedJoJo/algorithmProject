@@ -1,4 +1,4 @@
-	discription：This project is created to document my journey of practicing LeetCode algorithm questions while preparing for the huawei od position.
+discription：This project is created to document my journey of practicing LeetCode algorithm questions while preparing for the huawei od position.
 
 git status;git add .;git commit -m "update";git push;
 
@@ -4951,6 +4951,72 @@ public:
 
 ```
 
+### [34. 二叉树染色](https://leetcode.cn/problems/er-cha-shu-ran-se-UGC/)
+
+中等
+
+小扣有一个根结点为 `root` 的二叉树模型，初始所有结点均为白色，可以用蓝色染料给模型结点染色，模型的每个结点有一个 `val` 价值。小扣出于美观考虑，希望最后二叉树上每个蓝色相连部分的结点个数不能超过 `k` 个，求所有染成蓝色的结点价值总和最大是多少？
+
+**示例 1：**
+
+> 输入：`root = [5,2,3,4], k = 2`
+>
+> 输出：`12`
+>
+> 解释：`结点 5、3、4 染成蓝色，获得最大的价值 5+3+4=12`![image.png](https://pic.leetcode.cn/1616126267-BqaCRj-image.png)
+
+**示例 2：**
+
+> 输入：`root = [4,1,3,9,null,null,2], k = 2`
+>
+> 输出：`16`
+>
+> 解释：结点 4、3、9 染成蓝色，获得最大的价值 4+3+9=16![image.png](https://pic.leetcode.cn/1616126301-gJbhba-image.png)
+
+**提示：**
+
+- `1 <= k <= 10`
+- `1 <= val <= 10000`
+- 1 <= 结点数量 <= 10000`
+
+```c++
+class Solution {
+private:
+    int k;
+
+public:
+    vector<int> dp(TreeNode* node) {
+        if (!node) {
+            return vector<int>(k + 1);
+        }
+
+        vector<int> l = dp(node->left);
+        vector<int> r = dp(node->right);
+
+        vector<int> ans(k + 1);
+        // if we paint node as blue
+        for (int i = 0; i < k; ++i) {
+            for (int j = 0; i + j < k; ++j) {
+                ans[i + j + 1] = max(ans[i + j + 1], l[i] + r[j] + node->val);
+            }
+        }
+        // otherwise
+        for (int i = 0; i <= k; ++i) {
+            for (int j = 0; j <= k; ++j) {
+                ans[0] = max(ans[0], l[i] + r[j]);
+            }
+        }
+        return ans;
+    }
+
+    int maxValue(TreeNode* root, int k) {
+        this->k = k;
+        vector<int> ans = dp(root);
+        return *max_element(ans.begin(), ans.end());
+    }
+};
+```
+
 
 
 # 贪心
@@ -5333,7 +5399,73 @@ public:
 
 460 
 
-1224
+### [1224. 最大相等频率](https://leetcode.cn/problems/maximum-equal-frequency/)
+
+尝试过
+
+困难
+
+提示
+
+
+
+给你一个正整数数组 `nums`，请你帮忙从该数组中找出能满足下面要求的 **最长** 前缀，并返回该前缀的长度：
+
+- 从前缀中 **恰好删除一个** 元素后，剩下每个数字的出现次数都相同。
+
+如果删除这个元素后没有剩余元素存在，仍可认为每个数字都具有相同的出现次数（也就是 0 次）。
+
+ 
+
+**示例 1：**
+
+```
+输入：nums = [2,2,1,1,5,3,3,5]
+输出：7
+解释：对于长度为 7 的子数组 [2,2,1,1,5,3,3]，如果我们从中删去 nums[4] = 5，就可以得到 [2,2,1,1,3,3]，里面每个数字都出现了两次。
+```
+
+**示例 2：**
+
+```
+输入：nums = [1,1,1,2,2,2,3,3,3,4,4,4,5]
+输出：13
+```
+
+ 
+
+**提示：**
+
+- `2 <= nums.length <= 105`
+- `1 <= nums[i] <= 105`
+
+```c++
+//没读懂题
+class Solution { // 22/45  （错误答案 
+public:
+    int maxEqualFreq(vector<int>& nums) {
+        int result = 0;
+        int time = 0;
+        int count = 1;
+        for(int j = 1; j < nums.size(); j++){
+            if(j+1 < nums.size() && nums[j-1] != nums[j] && nums[j] != nums[j+1]){
+                time++;
+                if(time == 2){
+                    count = 1;
+                }
+                continue;
+            }
+            
+            count++;
+            result = max(result, count);
+            
+        }
+        return result;
+    }
+};
+```
+
+
 
 # ！双指针
 
@@ -5396,7 +5528,80 @@ public:
 };
 ```
 
-15 
+### [15. 三数之和](https://leetcode.cn/problems/3sum/)
+
+中等
+
+提示
+
+给你一个整数数组 `nums` ，判断是否存在三元组 `[nums[i], nums[j], nums[k]]` 满足 `i != j`、`i != k` 且 `j != k` ，同时还满足 `nums[i] + nums[j] + nums[k] == 0` 。请你返回所有和为 `0` 且不重复的三元组。
+
+**注意：**答案中不可以包含重复的三元组。
+
+**示例 1：**
+
+```
+输入：nums = [-1,0,1,2,-1,-4]
+输出：[[-1,-1,2],[-1,0,1]]
+解释：
+nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0 。
+nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0 。
+nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0 。
+不同的三元组是 [-1,0,1] 和 [-1,-1,2] 。
+注意，输出的顺序和三元组的顺序并不重要。
+```
+
+**示例 2：**
+
+```
+输入：nums = [0,1,1]
+输出：[]
+解释：唯一可能的三元组和不为 0 。
+```
+
+**示例 3：**
+
+```
+输入：nums = [0,0,0]
+输出：[[0,0,0]]
+解释：唯一可能的三元组和为 0 。
+```
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        vector<vector<int>> ret;
+        sort(nums.begin(), nums.end()); //有序后才能使用双指针
+        for(int i = 0; i < nums.size(); ++i){ //确定第一个元素 nums[i]
+            if(i > 0 && nums[i] == nums[i-1]) continue; //去除重复nums[i]
+
+            int left = i + 1;
+            int right = nums.size() - 1;
+            while(left < right){
+                if(left > i + 1 && nums[left] == nums[left-1]){
+                    left++; // 去除重复 nums[left] ，//左指针 右移
+                    continue;
+                }
+
+                while(left < right && nums[i] + nums[left] + nums[right] > 0){
+                    right--; //nums[right] 元素过大， 右指针 左移
+                }
+
+                if(left == right) break;
+
+                if(nums[i] + nums[left] + nums[right] == 0){
+                    ret.push_back({nums[i], nums[left], nums[right]});
+                }
+                left++; //左指针 右移
+            }
+        }
+        return ret;
+    }
+};
+```
+
+
 
 ### [42. 接雨水](https://leetcode.cn/problems/trapping-rain-water/)
 
@@ -5492,9 +5697,105 @@ public:
 };
 ```
 
+### [18. 四数之和](https://leetcode.cn/problems/4sum/)
+
+中等
+
+给你一个由 `n` 个整数组成的数组 `nums` ，和一个目标值 `target` 。请你找出并返回满足下述全部条件且**不重复**的四元组 `[nums[a], nums[b], nums[c], nums[d]]` （若两个四元组元素一一对应，则认为两个四元组重复）：
+
+- `0 <= a, b, c, d < n`
+- `a`、`b`、`c` 和 `d` **互不相同**
+- `nums[a] + nums[b] + nums[c] + nums[d] == target`
+
+你可以按 **任意顺序** 返回答案 。
+
+**示例 1：**
+
+```
+输入：nums = [1,0,-1,0,-2,2], target = 0
+输出：[[-2,-1,1,2],[-2,0,0,2],[-1,0,0,1]]
+```
+
+**示例 2：**
+
+```
+输入：nums = [2,2,2,2,2], target = 8
+输出：[[2,2,2,2]]
+```
+
+**提示：**
+
+- `1 <= nums.length <= 200`
+- `-109 <= nums[i] <= 109`
+- `-109 <= target <= 109`
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> fourSum(vector<int>& nums, int target) {
+        vector<vector<int>> res;
+        int n = nums.size();
+        if (n < 4) return res;
+
+        sort(nums.begin(), nums.end());
+
+        for (int i = 0; i < n - 3; ++i) {
+            // 去重 i
+            if (i > 0 && nums[i] == nums[i - 1]) continue;
+
+            // 剪枝（可选，但很常见）
+            long long min1 = (long long)nums[i] //防止溢出
+                           + nums[i + 1]
+                           + nums[i + 2]
+                           + nums[i + 3];
+            if (min1 > target) break;
+
+            long long max1 = (long long)nums[i]
+                           + nums[n - 1]
+                           + nums[n - 2]
+                           + nums[n - 3];
+            if (max1 < target) continue;
+
+            for (int j = i + 1; j < n - 2; ++j) {
+                // 去重 j
+                if (j > i + 1 && nums[j] == nums[j - 1]) continue;
+
+                int left = j + 1;
+                int right = n - 1;
+
+                while (left < right) {
+                    long long sum =
+                        (long long)nums[i] +
+                        nums[j] +
+                        nums[left] +
+                        nums[right];
+
+                    if (sum == target) {
+                        res.push_back(
+                            {nums[i], nums[j], nums[left], nums[right]}
+                        );
+
+                        // 左右去重
+                        int lv = nums[left];
+                        int rv = nums[right];
+                        while (left < right && nums[left] == lv) left++;
+                        while (left < right && nums[right] == rv) right--;
+                    }
+                    else if (sum < target) {
+                        left++;
+                    }
+                    else {
+                        right--;
+                    }
+                }
+            }
+        }
+        return res;
+    }
+};
+```
 
 
-18 
 
 1163
 
