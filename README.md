@@ -40,8 +40,8 @@ git status;git add .;git commit -m "update";git push;
 781 p
 815 (这个出题的没学过中文)
 846 -p
-871 
-974
+- 871 -p
+974 -p
 - 1074 
 1109
 - 1163 
@@ -2765,7 +2765,78 @@ public:
 };
 ```
 
-974 
+### [974. 和可被 K 整除的子数组](https://leetcode.cn/problems/subarray-sums-divisible-by-k/)
+
+中等
+
+给定一个整数数组 `nums` 和一个整数 `k` ，返回其中元素之和可被 `k` 整除的非空 **子数组** 的数目。
+
+**子数组** 是数组中 **连续** 的部分。
+
+ 
+
+**示例 1：**
+
+```
+输入：nums = [4,5,0,-2,-3,1], k = 5
+输出：7
+解释：
+有 7 个子数组满足其元素之和可被 k = 5 整除：
+[4, 5, 0, -2, -3, 1], [5], [5, 0], [5, 0, -2, -3], [0], [0, -2, -3], [-2, -3]
+```
+
+**示例 2:**
+
+```
+输入: nums = [5], k = 9
+输出: 0
+```
+
+**提示:**
+
+- `1 <= nums.length <= 3 * 104`
+- `-104 <= nums[i] <= 104`
+- `2 <= k <= 104`
+
+```c++
+class Solution { //gpt
+public:
+    int subarraysDivByK(vector<int>& nums, int k) {
+        // cnt[mod] 表示：前缀和 % k == mod 出现的次数
+        unordered_map<int, int> cnt;
+
+        // 非常关键：
+        // 前缀和为 0 时，余数为 0，先出现 1 次
+        // 用来处理：从下标 0 开始的子数组
+        cnt[0] = 1;
+
+        int sum = 0;     // 当前前缀和
+        int result = 0;  // 结果：满足条件的子数组个数
+
+        for (int x : nums) {
+            // 1. 累加前缀和
+            sum += x;
+
+            // 2. 计算当前前缀和对 k 的余数
+            //    C++ 中负数 % k 仍是负数，需要修正
+            int mod = ((sum % k) + k) % k;
+
+            // 3. 如果之前出现过相同余数
+            //    说明存在子数组，其和可被 k 整除
+            if (cnt.count(mod)) {
+                result += cnt[mod];
+            }
+
+            // 4. 当前余数出现次数 +1
+            cnt[mod]++;
+        }
+
+        return result;
+    }
+};
+```
+
+
 
 523 
 
