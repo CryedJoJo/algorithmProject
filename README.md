@@ -3259,7 +3259,7 @@ public:
                 if (s[i] == s[j] && (j - i <= 2 || dp[i + 1][j - 1])) {
                     dp[i][j] = true;
 
-                    int len = j - i + 1;
+                    int len = j - i + 1 ;
                     if (len > maxLen) {
                         maxLen = len;
                         start = i;
@@ -4141,6 +4141,78 @@ int main(){
     findLen(first, last);
     return 0;
 }
+```
+
+### [934. 最短的桥](https://leetcode.cn/problems/shortest-bridge/)
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> pos = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+    int shortestBridge(vector<vector<int>>& grid) { 
+        //初始思路是对的
+        // 1、用DFS，遍历第一个岛，找到每个属于第一个岛的 “1”
+        // 2、将第一个岛的所以 “1” 变成 “-1” 或其他数值用与区分另一个岛
+        int n = grid.size(); bool firstIsland = false;
+        for(int i = 0; i < n && !firstIsland; ++i){
+            for(int j = 0; j < n && !firstIsland; ++j){
+                if(grid[i][j] == 1 ){
+                    dfs(grid, i, j);
+                    firstIsland = true;
+                }
+            }
+        }
+
+        return bfs(grid);
+        // 3、重点来了，用BFS遍历grid，用一个队列存放 所有 -1 的元素，
+            // 用{i, j, dist}格式 存入queue
+        // 4、BFS中用while循环遍历queue，遇到第一个grid[i][j] == 1时返回对应的dist
+        // 遇到 grid[i][j] == 0 时，将对应{i, j, dist+1}放入queue，
+        // 同时将grid[i][j] = '-1' 防止重复如queue
+    }
+
+    void dfs(vector<vector<int>>& grid, int i, int j){
+        // -------------↓
+        if(i < 0 || j < 0 || i >= grid.size() || j >= grid.size()) return;
+        if(grid[i][j] != 1) return;
+        // -------------↑ 上面 两行代码是不能写成 ↓ 的这种形式，
+        // 因为grid[i][j] 可能是 -1 导致死循环
+        /*
+         if(i < 0 || j < 0 || i >= grid.size() || j >= grid.size() || grid[i][j] == 0)
+            return;
+        */
+
+        grid[i][j] = -1; //1、
+        for(auto p: pos) dfs(grid, i+p[0], j+p[1]);
+    }
+
+    int bfs(vector<vector<int>>& grid){
+        queue<tuple<int, int, int>> q; //3、
+        for(int i = 0; i < grid.size(); ++i)
+            for(int j = 0; j < grid.size(); ++j)
+                if(grid[i][j] == -1) q.push({i, j, 0});
+
+        while(!q.empty()){
+            auto [i, j, dist] = q.front();
+            q.pop();
+
+            for(auto p : pos){ //4、
+                int ii = i+p[0];
+                int jj = j+p[1];
+                if(ii < 0 || jj < 0 || ii >= grid.size() || jj >= grid.size()) 
+                    continue;
+
+                if(grid[ii][jj] == 1) return dist;
+
+                if(grid[ii][jj] == 0){
+                    grid[ii][jj] = -1;
+                    q.push({ii, jj, dist+1});
+                }
+            }
+        }
+        return -1;
+    }
+};
 ```
 
 
