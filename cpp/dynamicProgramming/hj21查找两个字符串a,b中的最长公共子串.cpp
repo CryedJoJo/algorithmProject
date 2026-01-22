@@ -1,4 +1,6 @@
 #include <bits/stdc++.h> //solo
+#include <unordered_map>
+#include <vector>
 using namespace std;
 
 void fun(string& a, string& b){
@@ -27,11 +29,12 @@ void fun(string& a, string& b){
                 dp[i+1][j+1] = dp[i][j]+1;
                 if(maxLen <= dp[i+1][j+1]){
                     maxLen = dp[i+1][j+1];
+                    //i 是 当前最长子串的最后一个字母的下标
                     int start = i - maxLen + 1;
-                    //开始位置就是 i - maxLen + 1
+                    //子串开始位置i - maxLen + 1;
                     posLen[start] = maxLen; 
                     //maxLen 表示最长字串长度
-                    //i 表示 最长字串的最后一个字母的位置
+                    
                 }
             }
         }
@@ -45,6 +48,10 @@ void fun(string& a, string& b){
                 start = e.first;
             }
         }
+    }
+    if(maxLen == 0){
+        cout << "";
+        return;
     }
     cout << sortStr.substr(start, maxLen);
 }
